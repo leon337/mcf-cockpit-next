@@ -11,9 +11,11 @@ import {
 export function InsightsView({
   data,
   search = "",
+  onSelectProject,
 }: {
   data: EcosystemResponse;
   search?: string;
+  onSelectProject: (projectId: string) => void;
 }) {
   const allInsights = deriveInsights(data);
   const summary = insightSummary(data);
@@ -87,7 +89,7 @@ export function InsightsView({
 
       <section className="grid gap-3">
         {insights.map((insight) => (
-          <InsightCard key={insight.id} insight={insight} />
+          <InsightCard key={insight.id} insight={insight} onSelectProject={onSelectProject} />
         ))}
         {!insights.length ? (
           <div className="rounded-2xl border border-dashed border-white/10 p-6 text-center text-sm text-slate-500">
@@ -105,7 +107,13 @@ export function InsightsView({
   );
 }
 
-function InsightCard({ insight }: { insight: EcosystemInsight }) {
+function InsightCard({
+  insight,
+  onSelectProject,
+}: {
+  insight: EcosystemInsight;
+  onSelectProject: (projectId: string) => void;
+}) {
   const style =
     insight.severity === "attention"
       ? "border-amber-400/20 bg-amber-400/[0.045]"
@@ -139,12 +147,14 @@ function InsightCard({ insight }: { insight: EcosystemInsight }) {
 
       <div className="mt-4 flex flex-wrap gap-2">
         {insight.projects.slice(0, 12).map((project) => (
-          <span
+          <button
             key={project.id}
-            className="rounded-lg border border-white/10 bg-black/10 px-2.5 py-1.5 text-xs text-slate-400"
+            type="button"
+            onClick={() => onSelectProject(project.id)}
+            className="rounded-lg border border-white/10 bg-black/10 px-2.5 py-1.5 text-xs text-slate-400 transition hover:border-sky-400/30 hover:text-sky-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-400"
           >
             {project.label}
-          </span>
+          </button>
         ))}
         {insight.projects.length > 12 ? (
           <span className="px-2.5 py-1.5 text-xs text-slate-600">
