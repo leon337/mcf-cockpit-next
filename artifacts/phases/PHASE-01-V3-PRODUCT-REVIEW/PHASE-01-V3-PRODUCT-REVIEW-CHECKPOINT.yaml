@@ -1,0 +1,33 @@
+schema_version: 1
+mission: MCF-COCKPIT-REVIEW-001
+mcf_issue: 295
+project: leon337/mcf-cockpit-next
+phase: PHASE-01-V3-PRODUCT-REVIEW
+risk_class: B
+baseline:
+  main: c75a58bc2ef06acb23ee5aec9ebfb02ea2cc07df
+  v3_product_commit: da19df5b817214c16a6507c10562420c1fbb1102
+state:
+  v3: COMPLETE
+  review: COMPLETE
+  functional_changes: false
+decision:
+  next_line: V3.1
+  reason: interaction_and_navigation_hardening_without_material_architecture_change
+proposed_next_mission:
+  id: MCF-COCKPIT-V3-1-001
+  title: Operability & Navigation Hardening
+  implementation_started: false
+v4_gate:
+  requires_material_new_capability:
+    - authenticated_operations
+    - governed_writes
+    - execution_plane
+    - bidirectional_runtime
+    - authorized_private_data
+continuity:
+  next_read:
+    - docs/PRODUCT-REVIEW-V3-001.md
+    - docs/HANDOFF-MCF-COCKPIT-V3-001.md
+    - .mcf/project-capsule.yaml
+    - artifacts/phases/PHASE-01-V3-PRODUCT-REVIEW/README.md

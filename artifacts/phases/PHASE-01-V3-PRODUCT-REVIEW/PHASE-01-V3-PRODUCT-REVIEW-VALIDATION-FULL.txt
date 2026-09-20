@@ -1,0 +1,25 @@
+PHASE-01-V3-PRODUCT-REVIEW FULL VALIDATION
+
+Evidence baseline:
+- mcf-cockpit-next main: c75a58bc2ef06acb23ee5aec9ebfb02ea2cc07df
+- canonical V3 handoff present on main
+- V3 audited product commit: da19df5b817214c16a6507c10562420c1fbb1102
+- MCF registry merge: 9f5fc4e9b55867e3553c7080b4d3eb78e6887478
+- MCF review issue: #295
+
+Code evidence:
+- src/App.tsx: URL view read once; replaceState navigation; selected project state is local
+- src/components/ecosystem/views.tsx: area replaceState; global search only consumed in inventory path
+- src/components/project/project-card-dialog.tsx: tab can be read from URL, tab changes are not written back
+- src/components/v3/missions-view.tsx: real issue list with external GitHub action
+- src/components/v3/insights-view.tsx: affected projects rendered as non-interactive spans
+- src/components/v3/relationship-graph.tsx: static radial layout with horizontal overflow control
+
+Provider evidence:
+- Render service name: mcf-cockpit-next-v3-audit
+- provider state observed: live
+
+No claim:
+- no fresh browser screenshot audit was completed in this phase
+- no independent multi-model cognition is claimed
+- no product implementation is claimed
