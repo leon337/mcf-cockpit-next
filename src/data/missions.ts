@@ -15,6 +15,7 @@ export const MissionSchema = z.object({
   number: z.number(),
   code: z.string().nullable(),
   title: z.string(),
+  body: z.string().nullable().optional(),
   url: z.string().url(),
   state: z.enum(["open", "closed"]),
   stateReason: z.string().nullable().optional(),
