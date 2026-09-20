@@ -14,7 +14,7 @@
       <div class="brand-mark">M</div>
       <div>
         <strong>MCF Cockpit Next</strong>
-        <span>Etapa 1 · GitHub real</span>
+        <span>Etapa 2 · Hierarquia real</span>
       </div>
     </div>
     <div class="top-actions">
@@ -27,21 +27,69 @@
     <section class="hero">
       <div class="hero-copy">
         <span class="eyebrow">MCF WORKSPACE</span>
-        <h1>Conta e repositórios</h1>
-        <p>Primeiro bloco do novo cockpit. Sem dados simulados e sem herdar o layout antigo.</p>
+        <h1>Ecossistema MCF</h1>
+        <p>Uma visão hierárquica com Registry canônico, GitHub live e proveniência explícita.</p>
       </div>
-      <div class="stage-badge">ETAPA 1</div>
+      <div class="stage-badge">ETAPA 2</div>
     </section>
 
     <section class="account-card" id="accountCard" aria-live="polite">
       <div class="skeleton account-skeleton"></div>
     </section>
 
-    <section class="repo-section">
+    <nav class="view-tabs" aria-label="Visões do cockpit">
+      <button class="view-tab active" data-view="ecosystem" type="button">Ecossistema</button>
+      <button class="view-tab" data-view="repositories" type="button">Todos os repositórios</button>
+    </nav>
+
+    <div class="error-box" id="errorBox" hidden></div>
+
+    <section class="view-panel active" id="ecosystemView">
+      <div class="ecosystem-summary" id="ecosystemSummary">
+        <div class="skeleton hierarchy-skeleton"></div>
+      </div>
+
+      <div class="hierarchy-root">
+        <article class="authority-node" id="authorityNode">
+          <span class="node-kicker">AUTORIDADE</span>
+          <strong>—</strong>
+          <small>carregando…</small>
+        </article>
+
+        <div class="hierarchy-line vertical"></div>
+
+        <article class="core-node" id="coreNode">
+          <div class="skeleton core-skeleton"></div>
+        </article>
+
+        <div class="hierarchy-line vertical short"></div>
+
+        <div class="group-grid" id="groupGrid">
+          <div class="skeleton group-skeleton"></div>
+          <div class="skeleton group-skeleton"></div>
+          <div class="skeleton group-skeleton"></div>
+        </div>
+      </div>
+
+      <section class="legend-card">
+        <div>
+          <span class="eyebrow">COMO LER</span>
+          <h3>Canônico ≠ classificação visual</h3>
+        </div>
+        <div class="legend-items">
+          <span><i class="legend-dot canonical"></i> Registry MCF</span>
+          <span><i class="legend-dot integrated"></i> integração 4/4 documentada</span>
+          <span><i class="legend-dot discovered"></i> descoberto no GitHub</span>
+          <span><i class="legend-dot model"></i> classificação do Cockpit</span>
+        </div>
+      </section>
+    </section>
+
+    <section class="view-panel" id="repositoriesView" hidden>
       <div class="section-head">
         <div>
-          <span class="eyebrow">ECOSSISTEMA MCF</span>
-          <h2>Repositórios</h2>
+          <span class="eyebrow">INVENTÁRIO</span>
+          <h2>Todos os repositórios representados</h2>
         </div>
         <div class="repo-tools">
           <label class="search-box">
@@ -52,7 +100,6 @@
         </div>
       </div>
 
-      <div class="error-box" id="errorBox" hidden></div>
       <div class="repo-grid" id="repoGrid">
         <div class="skeleton repo-skeleton"></div>
         <div class="skeleton repo-skeleton"></div>
@@ -63,12 +110,12 @@
     <section class="provenance-card" id="provenanceCard">
       <div>
         <span class="eyebrow">PROVENIÊNCIA</span>
-        <h3>Origem dos dados</h3>
+        <h3>O que é fato e o que é modelo de navegação</h3>
       </div>
       <div class="provenance-grid">
-        <div><span>Fonte</span><strong id="provSource">—</strong></div>
-        <div><span>Gerado</span><strong id="provGenerated">—</strong></div>
-        <div><span>Seleção</span><strong id="provSelection">—</strong></div>
+        <div><span>Registry</span><strong id="provRegistry">—</strong></div>
+        <div><span>Estado canônico</span><strong id="provCurrentState">—</strong></div>
+        <div><span>GitHub</span><strong id="provGithub">—</strong></div>
       </div>
     </section>
   </main>
