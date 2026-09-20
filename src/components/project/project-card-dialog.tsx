@@ -1,11 +1,29 @@
 import {
-  Brain, Boxes, Cpu, Eye, FlaskConical, Package, ServerCog, Wrench, ExternalLink
+  Activity,
+  Brain,
+  Boxes,
+  Cpu,
+  ExternalLink,
+  Eye,
+  FlaskConical,
+  Github,
+  Info,
+  Network,
+  Package,
+  ServerCog,
+  Wrench,
 } from "lucide-react";
 import type { ComponentType, ReactNode } from "react";
 import type { EcosystemNode } from "@/data/schema";
-import { GROUP_PRESENTATION, displayName, trustFor } from "@/domain/ecosystem";
+import {
+  GROUP_PRESENTATION,
+  displayName,
+  relationInsights,
+  trustFor,
+} from "@/domain/ecosystem";
 import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogDescription, DialogTitle } from "@/components/ui/dialog";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 const ICONS: Record<string, ComponentType<{ className?: string }>> = {
   core: Brain,
@@ -15,7 +33,7 @@ const ICONS: Record<string, ComponentType<{ className?: string }>> = {
   applications: Package,
   labs: FlaskConical,
   interfaces: Eye,
-  support: Wrench
+  support: Wrench,
 };
 
 const PLAIN: Record<string, string> = {
@@ -38,20 +56,20 @@ const PLAIN: Record<string, string> = {
   "mcf-cockpit-live": "Coleção anterior de protótipos visuais do cockpit publicada com dados reais.",
   "mcf-long-mission-public": "Superfície pública relacionada ao acompanhamento de missões longas do MCF; ainda não está no Project Registry.",
   "mcf-control-center": "Painel relacionado ao controle e observação do MCF; descoberto no GitHub e ainda fora do Project Registry.",
-  "voicehub-linux": "Camada de comunicação por voz referenciada por um projeto MCF, mas sem entrada própria no Project Registry."
+  "voicehub-linux": "Camada de comunicação por voz referenciada por um projeto MCF, mas sem entrada própria no Project Registry.",
 };
 
 const EVIDENCE: Record<string, string> = {
   PROJECT_REGISTRY: "Project Registry",
   MCF_CURRENT_STATE_CF_4_OF_4: "Context Fabric 4/4",
   PROJECT_REGISTRY_REFERENCE: "Referência no Registry",
-  GITHUB_DISCOVERY: "Descoberta GitHub"
+  GITHUB_DISCOVERY: "Descoberta GitHub",
 };
 
 export function ProjectCardDialog({
   node,
   open,
-  onOpenChange
+  onOpenChange,
 }: {
   node: EcosystemNode | null;
   open: boolean;
@@ -63,11 +81,19 @@ export function ProjectCardDialog({
   const group = GROUP_PRESENTATION[node.classification.group] || GROUP_PRESENTATION.support;
   const trust = trustFor(node);
   const Icon = ICONS[node.classification.group] || Boxes;
-  const meaning = PLAIN[node.id] || repository?.description || `Este projeto pertence à área “${group.title}”. ${group.short}`;
+  const meaning =
+    PLAIN[node.id] ||
+    repository?.description ||
+    `Este projeto pertence à área “${group.title}”. ${group.short}`;
+  const relations = relationInsights(node);
+  const requestedTab = new URLSearchParams(window.location.search).get("tab");
+  const defaultTab = requestedTab && ["overview", "mcf", "github", "activity"].includes(requestedTab)
+    ? requestedTab
+    : "overview";
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent>
+      <DialogContent className="sm:w-[min(980px,calc(100vw-3rem))]">
         <article className="p-5 sm:p-7 lg:p-8">
           <header className="flex items-start gap-4 pr-12">
             <div className="grid size-14 shrink-0 place-items-center rounded-2xl border border-sky-400/20 bg-sky-400/10 sm:size-16">
@@ -89,56 +115,182 @@ export function ProjectCardDialog({
             <span className="text-sm leading-5 text-slate-500">{trust.description}</span>
           </div>
 
-          <section className="mt-5 rounded-2xl border border-sky-400/20 bg-sky-400/[0.06] p-4 sm:p-5">
-            <span className="eyebrow">ENTENDA EM 10 SEGUNDOS</span>
-            <p className="mt-2 text-base leading-7 text-slate-100 sm:text-lg">{meaning}</p>
-          </section>
+          <Tabs defaultValue={defaultTab} className="mt-5">
+            <TabsList className="mb-4 w-full sm:w-max">
+              <TabsTrigger value="overview">
+                <Info className="mr-2 size-4" aria-hidden="true" />
+                Visão geral
+              </TabsTrigger>
+              <TabsTrigger value="mcf">
+                <Network className="mr-2 size-4" aria-hidden="true" />
+                MCF
+              </TabsTrigger>
+              <TabsTrigger value="github">
+                <Github className="mr-2 size-4" aria-hidden="true" />
+                GitHub
+              </TabsTrigger>
+              <TabsTrigger value="activity">
+                <Activity className="mr-2 size-4" aria-hidden="true" />
+                Atividade
+              </TabsTrigger>
+            </TabsList>
 
-          <section className="mt-4 grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-5">
-            <Stat label="Branch" value={repository?.defaultBranch} />
-            <Stat label="Linguagem" value={repository?.language} />
-            <Stat label="Issues" value={repository?.openIssues} />
-            <Stat label="Stars" value={repository?.stars} />
-            <Stat label="Forks" value={repository?.forks} />
-          </section>
+            <TabsContent value="overview">
+              <section className="rounded-2xl border border-sky-400/20 bg-sky-400/[0.06] p-4 sm:p-5">
+                <span className="eyebrow">ENTENDA EM 10 SEGUNDOS</span>
+                <p className="mt-2 text-base leading-7 text-slate-100 sm:text-lg">{meaning}</p>
+              </section>
 
-          <div className="mt-4 grid gap-3 lg:grid-cols-2">
-            <Facts title="Papel no MCF" rows={[
-              ["Área", group.title],
-              ["Relação", node.classification.relationLabel],
-              ["Confiança", trust.label],
-              ["Evidência", node.evidence.map((item) => EVIDENCE[item] || item).join(" · ")]
-            ]} />
-            <Facts title="Identidade técnica" rows={[
-              ["Lifecycle", node.registry.lifecycle],
-              ["Repo canônico", node.canonicalRepository || repository?.fullName],
-              ["Registry", node.registry.status],
-              ["Estado", node.registry.operationalState]
-            ]} />
-          </div>
+              <div className="mt-4 grid gap-3 lg:grid-cols-[1.2fr_0.8fr]">
+                <section className="rounded-2xl border border-white/10 bg-white/[0.02] p-4 sm:p-5">
+                  <span className="eyebrow">ONDE FICA NO ECOSSISTEMA</span>
+                  <div className="mt-3 flex items-center gap-3">
+                    <span className="grid size-12 place-items-center rounded-2xl bg-white/5 text-2xl">{group.icon}</span>
+                    <div>
+                      <strong className="block text-lg text-white">{group.title}</strong>
+                      <span className="mt-1 block text-sm leading-6 text-slate-400">{group.detail}</span>
+                    </div>
+                  </div>
+                </section>
 
-          <section className="mt-3 rounded-2xl border border-white/10 bg-white/[0.02] p-4 sm:p-5">
-            <span className="eyebrow">EVIDÊNCIAS E PROVENIÊNCIA</span>
-            <div className="mt-3 flex flex-wrap gap-2">
-              {node.evidence.map((item) => <Evidence key={item}>{EVIDENCE[item] || item}</Evidence>)}
-              {node.registry.path ? <Evidence>{node.registry.path}</Evidence> : null}
-              {node.registry.entrypoints.slice(0, 6).map((entry) => <Evidence key={entry}>↳ {entry}</Evidence>)}
-            </div>
-          </section>
+                <section className="rounded-2xl border border-white/10 bg-white/[0.02] p-4 sm:p-5">
+                  <span className="eyebrow">STATUS RÁPIDO</span>
+                  <dl className="mt-3 grid gap-2">
+                    <QuickFact label="Confiança" value={trust.label} />
+                    <QuickFact label="Lifecycle" value={node.registry.lifecycle} />
+                    <QuickFact label="Relação" value={node.classification.relationLabel} />
+                  </dl>
+                </section>
+              </div>
 
-          <footer className="mt-5 flex flex-col gap-3 border-t border-white/10 pt-5 text-sm text-slate-500 sm:flex-row sm:items-center sm:justify-between">
-            <span>{repository?.updatedAt ? `GitHub atualizado ${relative(repository.updatedAt)}` : "Sem metadados públicos de atividade"}</span>
-            {repository?.url ? (
-              <a
-                href={repository.url}
-                target="_blank"
-                rel="noreferrer"
-                className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl border border-sky-400/25 bg-sky-400/10 px-4 font-semibold text-sky-100 transition hover:bg-sky-400/15 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-400"
-              >
-                Ver código no GitHub <ExternalLink className="size-4" aria-hidden="true" />
-              </a>
-            ) : null}
-          </footer>
+              <section className="mt-4 grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-5">
+                <Stat label="Branch" value={repository?.defaultBranch} />
+                <Stat label="Linguagem" value={repository?.language} />
+                <Stat label="Issues" value={repository?.openIssues} />
+                <Stat label="Stars" value={repository?.stars} />
+                <Stat label="Forks" value={repository?.forks} />
+              </section>
+            </TabsContent>
+
+            <TabsContent value="mcf">
+              <div className="grid gap-3 lg:grid-cols-[1.1fr_0.9fr]">
+                <section className="rounded-2xl border border-white/10 bg-white/[0.02] p-4 sm:p-5">
+                  <span className="eyebrow">RELAÇÕES COMPROVADAS</span>
+                  <div className="mt-3 grid gap-3">
+                    {relations.length ? (
+                      relations.map((relation) => (
+                        <div key={relation.kind} className="rounded-2xl border border-white/10 bg-black/10 p-4">
+                          <strong className="block text-base text-white">{relation.title}</strong>
+                          <p className="mt-1 text-sm leading-6 text-slate-400">{relation.detail}</p>
+                          <span className="mt-2 block text-xs font-medium text-sky-300">Fonte: {relation.source}</span>
+                        </div>
+                      ))
+                    ) : (
+                      <div className="rounded-2xl border border-dashed border-white/10 p-4 text-sm leading-6 text-slate-500">
+                        Nenhuma relação explícita adicional foi publicada para este projeto.
+                      </div>
+                    )}
+                  </div>
+                </section>
+
+                <Facts
+                  title="Identidade no MCF"
+                  rows={[
+                    ["Área", group.title],
+                    ["Relação", node.classification.relationLabel],
+                    ["Lifecycle", node.registry.lifecycle],
+                    ["Repo canônico", node.canonicalRepository || repository?.fullName],
+                    ["Registry", node.registry.status],
+                    ["Estado", node.registry.operationalState],
+                  ]}
+                />
+              </div>
+
+              <section className="mt-3 rounded-2xl border border-white/10 bg-white/[0.02] p-4 sm:p-5">
+                <span className="eyebrow">EVIDÊNCIAS E ENTRYPOINTS</span>
+                <div className="mt-3 flex flex-wrap gap-2">
+                  {node.evidence.map((item) => <Evidence key={item}>{EVIDENCE[item] || item}</Evidence>)}
+                  {node.registry.path ? <Evidence>{node.registry.path}</Evidence> : null}
+                  {node.registry.entrypoints.slice(0, 8).map((entry) => <Evidence key={entry}>↳ {entry}</Evidence>)}
+                </div>
+              </section>
+            </TabsContent>
+
+            <TabsContent value="github">
+              {repository ? (
+                <div className="grid gap-3 lg:grid-cols-2">
+                  <Facts
+                    title="Repositório público"
+                    rows={[
+                      ["Nome", repository.fullName || repository.name],
+                      ["Branch", repository.defaultBranch],
+                      ["Linguagem", repository.language],
+                      ["Visibilidade", repository.visibility],
+                      ["Arquivado", repository.archived ? "Sim" : "Não"],
+                    ]}
+                  />
+
+                  <section className="rounded-2xl border border-white/10 bg-white/[0.02] p-4 sm:p-5">
+                    <span className="eyebrow">MÉTRICAS PÚBLICAS</span>
+                    <div className="mt-3 grid grid-cols-3 gap-2">
+                      <Stat label="Issues" value={repository.openIssues} />
+                      <Stat label="Stars" value={repository.stars} />
+                      <Stat label="Forks" value={repository.forks} />
+                    </div>
+
+                    {repository.url ? (
+                      <a
+                        href={repository.url}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="mt-4 inline-flex min-h-11 items-center justify-center gap-2 rounded-xl border border-sky-400/25 bg-sky-400/10 px-4 text-sm font-semibold text-sky-100 transition hover:bg-sky-400/15 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-400"
+                      >
+                        Ver código no GitHub
+                        <ExternalLink className="size-4" aria-hidden="true" />
+                      </a>
+                    ) : null}
+                  </section>
+                </div>
+              ) : (
+                <section className="rounded-2xl border border-violet-400/20 bg-violet-400/[0.05] p-5">
+                  <span className="eyebrow !text-violet-200">BOUNDARY DE PRIVACIDADE</span>
+                  <h3 className="mt-2 text-lg font-bold text-white">Metadados GitHub não publicados</h3>
+                  <p className="mt-2 text-sm leading-6 text-slate-400">
+                    O projeto possui identidade no MCF, mas o Cockpit público não recebeu metadados públicos do repositório. Nenhuma informação privada é inferida.
+                  </p>
+                </section>
+              )}
+            </TabsContent>
+
+            <TabsContent value="activity">
+              <div className="grid gap-3 md:grid-cols-2">
+                <ActivityCard
+                  title="Última atualização pública"
+                  value={repository?.updatedAt ? fullDate(repository.updatedAt) : "Sem dado público"}
+                  helper={repository?.updatedAt ? relative(repository.updatedAt) : "O Cockpit não infere atividade privada."}
+                />
+                <ActivityCard
+                  title="Último push público"
+                  value={repository?.pushedAt ? fullDate(repository.pushedAt) : "Sem dado público"}
+                  helper={repository?.pushedAt ? relative(repository.pushedAt) : "Nenhum timestamp público disponível."}
+                />
+                <ActivityCard
+                  title="Lifecycle MCF"
+                  value={node.registry.lifecycle || "Não declarado"}
+                  helper="Estado publicado pelo Project Registry."
+                />
+                <ActivityCard
+                  title="Estado operacional"
+                  value={node.registry.operationalState || "Não declarado"}
+                  helper="Exibido somente quando publicado no Registry."
+                />
+              </div>
+
+              <div className="mt-3 rounded-2xl border border-white/10 bg-white/[0.02] p-4 text-sm leading-6 text-slate-500">
+                Esta aba mostra apenas sinais de atividade disponíveis nas fontes atuais. Commits, PRs e eventos detalhados serão adicionados somente quando uma fonte explícita estiver conectada.
+              </div>
+            </TabsContent>
+          </Tabs>
         </article>
       </DialogContent>
     </Dialog>
@@ -150,6 +302,15 @@ function Stat({ label, value }: { label: string; value: string | number | null |
     <div className="rounded-2xl border border-white/10 bg-white/[0.025] p-3 sm:p-4">
       <span className="block text-xs font-bold uppercase tracking-wide text-slate-500">{label}</span>
       <strong className="mt-2 block truncate text-base font-semibold text-white">{value ?? "—"}</strong>
+    </div>
+  );
+}
+
+function QuickFact({ label, value }: { label: string; value: string | null | undefined }) {
+  return (
+    <div className="grid grid-cols-[6.5rem_1fr] gap-3 border-b border-white/5 py-2 last:border-0">
+      <dt className="text-sm text-slate-500">{label}</dt>
+      <dd className="m-0 text-sm font-medium text-slate-200">{value || "—"}</dd>
     </div>
   );
 }
@@ -171,7 +332,21 @@ function Facts({ title, rows }: { title: string; rows: Array<[string, string | n
 }
 
 function Evidence({ children }: { children: ReactNode }) {
-  return <span className="rounded-lg border border-white/10 bg-[#0c1724] px-2.5 py-1.5 text-xs text-slate-400">{children}</span>;
+  return (
+    <span className="rounded-lg border border-white/10 bg-[#0c1724] px-2.5 py-1.5 text-xs text-slate-400">
+      {children}
+    </span>
+  );
+}
+
+function ActivityCard({ title, value, helper }: { title: string; value: string; helper: string }) {
+  return (
+    <section className="rounded-2xl border border-white/10 bg-white/[0.02] p-4 sm:p-5">
+      <span className="eyebrow">{title}</span>
+      <strong className="mt-2 block text-lg text-white">{value}</strong>
+      <span className="mt-2 block text-sm leading-6 text-slate-500">{helper}</span>
+    </section>
+  );
 }
 
 function relative(value: string) {
@@ -181,4 +356,11 @@ function relative(value: string) {
   const hours = Math.round(minutes / 60);
   if (hours < 24) return `há ${hours} h`;
   return `há ${Math.round(hours / 24)} d`;
+}
+
+function fullDate(value: string) {
+  return new Date(value).toLocaleString("pt-BR", {
+    dateStyle: "short",
+    timeStyle: "short",
+  });
 }
