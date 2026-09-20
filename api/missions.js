@@ -41,6 +41,7 @@ function normalize(issue) {
     number: issue.number,
     code: codeMatch ? codeMatch[1] : null,
     title,
+    body: issue.body || null,
     url: issue.html_url,
     state: issue.state,
     stateReason: issue.state_reason || null,
