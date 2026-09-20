@@ -1,0 +1,47 @@
+PHASE-01-V3-1-IMPLEMENTATION FULL VALIDATION
+
+Mission: MCF-COCKPIT-V3-1-001
+Issue: #296
+Functional audited SHA: 6dd556e1cbdc18c2a3a402c1d99e1dc0794eb8cc
+
+Provider:
+- service: srv-dannudqjnfac73992m6g
+- deploy: dep-dannueijnfac73992oa0
+- url: https://mcf-cockpit-next-v31-audit.onrender.com
+- status: live
+
+Build evidence:
+- build command included npm run check
+- build command included npm run build
+- build command included test:stage5
+- build command included test:v3
+- build command included test:v3.1
+- Render: Build successful
+
+Runtime evidence:
+- node server.js started
+- MCF Cockpit Next listening on port 10000
+- Render: service is live
+
+V3.1 verifier evidence:
+- URL params present
+- pushState / replaceState present
+- popstate restoration present
+- project/tab URL state present
+- mission URL state present
+- mission detail present
+- mission PR exclusion preserved
+- mission progress fabrication guard passed
+- Insights project navigation present
+- graph group/evidence filters present
+- graph keyboard activation present
+- ecosystem search/controlled area present
+- no Execution Plane patterns detected
+- failures: []
+
+Browser visual QA:
+- Firecrawl scrape: FAILED_EXTERNAL_LIMIT — insufficient credits
+- Firecrawl interact: FAILED_EXTERNAL_LIMIT — insufficient credits
+- independent HTTP smoke from container: FAILED_EXTERNAL_NETWORK — DNS resolution unavailable
+
+No visual PASS is claimed for V3.1.
