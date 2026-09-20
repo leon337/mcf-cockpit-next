@@ -4,6 +4,7 @@
   "private": true,
   "description": "MCF Cockpit Next — incremental GitHub-backed cockpit",
   "scripts": {
-    "check": "node --check api/github.js && node --check api/ecosystem.js && node --check assets/app.js && node --check assets/guided.js && node --check assets/project-card.js"
+    "check": "node --check api/github.js && node --check api/ecosystem.js && node --check assets/app.js && node --check assets/guided.js && node --check assets/project-card.js && node --check server.js",
+    "start": "node server.js"
   }
 }
