@@ -1,0 +1,126 @@
+{
+  "mission": "MCF-COCKPIT-NEXT-FRAMEWORK-001",
+  "mcfIssue": 284,
+  "status": "SUCCEEDED_LOCAL_AUDIT_READY",
+  "executionModel": "MCF-EXECUTE-LOCAL-TEAM-compatible deterministic parallel worktrees",
+  "selectedAgents": [
+    {
+      "name": "Sofia",
+      "role": "Arquitetura de Software"
+    },
+    {
+      "name": "Helena",
+      "role": "Engenharia Frontend"
+    },
+    {
+      "name": "Isabela",
+      "role": "UI"
+    },
+    {
+      "name": "Marina",
+      "role": "Acessibilidade"
+    },
+    {
+      "name": "Renato",
+      "role": "Qualidade e Testes"
+    },
+    {
+      "name": "Ricardo",
+      "role": "Segurança"
+    },
+    {
+      "name": "Gabriel",
+      "role": "Integração, Versionamento e Release"
+    }
+  ],
+  "workerProcesses": [
+    {
+      "agents": [
+        "Sofia"
+      ],
+      "pid": 269008,
+      "commit": "884143e419aa0e3a14417bae80c9c070e9fbdb3f"
+    },
+    {
+      "agents": [
+        "Helena"
+      ],
+      "pid": 269129,
+      "commit": "356624c095b3e292758f70d787862892a759701d"
+    },
+    {
+      "agents": [
+        "Isabela",
+        "Marina"
+      ],
+      "pid": 269209,
+      "commit": "e6d2e0868777eecdc9b7bdfa0e8ba23cdf4de386"
+    },
+    {
+      "agents": [
+        "Renato",
+        "Ricardo"
+      ],
+      "pid": 269316,
+      "commit": "1c590b29c0bb43c44875f981e977ca12c31a30aa"
+    }
+  ],
+  "integration": {
+    "branch": "feat/framework-react-stage5",
+    "base": "d060851d966dd50f159bf44a7abc61723e2fc74d",
+    "consolidatedBy": "Gabriel"
+  },
+  "stack": [
+    "React",
+    "TypeScript",
+    "Vite",
+    "Tailwind CSS",
+    "shadcn/ui conventions",
+    "Radix UI",
+    "TanStack Query",
+    "Zod",
+    "Lucide React"
+  ],
+  "gates": {
+    "typecheck": "PASS",
+    "viteBuild": "PASS",
+    "automatedStage5Checks": "10/10 PASS",
+    "dependencyAuditRuntime": "0 vulnerabilities",
+    "gitDiffCheck": "PASS",
+    "privacyPrivateProject": "PASS",
+    "githubSecondaryAction": "PASS"
+  },
+  "responsiveQa": [
+    {
+      "requested": "390x844",
+      "chromeCssViewport": "500x705",
+      "bodyFont": "16px",
+      "dialogTitle": "24px",
+      "horizontalOverflow": false,
+      "dialogInside": true,
+      "note": "Chrome headless minimum width; mobile <640 breakpoint exercised"
+    },
+    {
+      "viewport": "768x885",
+      "bodyFont": "16px",
+      "dialogTitle": "30px",
+      "horizontalOverflow": false,
+      "dialogInside": true
+    },
+    {
+      "viewport": "1440x761",
+      "bodyFont": "16px",
+      "dialogTitle": "30px",
+      "horizontalOverflow": false,
+      "dialogInside": true
+    },
+    {
+      "viewport": "1920x941",
+      "bodyFont": "18px",
+      "dialogTitle": "33.75px",
+      "horizontalOverflow": false,
+      "dialogInside": true
+    }
+  ],
+  "cognitiveIndependenceProven": false
+}
