@@ -14,7 +14,7 @@
       <div class="brand-mark">M</div>
       <div>
         <strong>MCF Cockpit Next</strong>
-        <span>Etapa 2 · Hierarquia real</span>
+        <span>Etapa 3 · Ecossistema guiado</span>
       </div>
     </div>
     <div class="top-actions">
@@ -28,9 +28,9 @@
       <div class="hero-copy">
         <span class="eyebrow">MCF WORKSPACE</span>
         <h1>Ecossistema MCF</h1>
-        <p>Uma visão hierárquica com Registry canônico, GitHub live e proveniência explícita.</p>
+        <p>Comece pela visão simples para entender quem decide, quem coordena e para que serve cada parte.</p>
       </div>
-      <div class="stage-badge">ETAPA 2</div>
+      <div class="stage-badge">ETAPA 3</div>
     </section>
 
     <section class="account-card" id="accountCard" aria-live="polite">
@@ -38,13 +38,68 @@
     </section>
 
     <nav class="view-tabs" aria-label="Visões do cockpit">
-      <button class="view-tab active" data-view="ecosystem" type="button">Ecossistema</button>
+      <button class="view-tab active" data-view="guided" type="button">Entender o ecossistema</button>
+      <button class="view-tab" data-view="technical" type="button">Mapa técnico</button>
       <button class="view-tab" data-view="repositories" type="button">Todos os repositórios</button>
     </nav>
 
     <div class="error-box" id="errorBox" hidden></div>
 
-    <section class="view-panel active" id="ecosystemView">
+    <section class="view-panel active" id="guidedView">
+      <section class="guided-intro">
+        <div>
+          <span class="eyebrow">LEITURA EM 4 PASSOS</span>
+          <h2>Como o MCF funciona</h2>
+          <p>Use esta visão para entender a função de cada parte antes de entrar nos detalhes técnicos.</p>
+        </div>
+        <div class="reading-path">
+          <div class="reading-step"><b>1</b><span><strong>Você decide</strong><small>LEANDRO é a autoridade final.</small></span></div>
+          <i>→</i>
+          <div class="reading-step"><b>2</b><span><strong>MCF coordena</strong><small>Organiza regras, missões e execução.</small></span></div>
+          <i>→</i>
+          <div class="reading-step"><b>3</b><span><strong>Áreas especializam</strong><small>Cada grupo resolve um tipo de problema.</small></span></div>
+          <i>→</i>
+          <div class="reading-step"><b>4</b><span><strong>Projetos executam</strong><small>Repos concretos fazem o trabalho.</small></span></div>
+        </div>
+      </section>
+
+      <section class="simple-flow">
+        <article class="simple-authority">
+          <span class="simple-icon">👤</span>
+          <div><span class="node-kicker">QUEM DECIDE</span><h3>LEANDRO</h3><p>Define objetivos, aprova gates e mantém a autoridade final.</p></div>
+        </article>
+        <div class="simple-arrow"><span>orienta</span>↓</div>
+        <article class="simple-core">
+          <span class="simple-icon">🧠</span>
+          <div><span class="node-kicker">QUEM COORDENA</span><h3>MCF Core</h3><p>Transforma objetivos em missões governadas e conecta as capacidades do ecossistema.</p></div>
+        </article>
+        <div class="simple-arrow"><span>organiza em áreas</span>↓</div>
+      </section>
+
+      <section class="guided-groups">
+        <div class="section-head guided-head">
+          <div>
+            <span class="eyebrow">ÁREAS DO ECOSSISTEMA</span>
+            <h2>Para que serve cada parte?</h2>
+          </div>
+          <span class="guided-hint">Clique em uma área para ver seus projetos</span>
+        </div>
+        <div class="guided-group-grid" id="guidedGroupGrid">
+          <div class="skeleton guided-skeleton"></div>
+          <div class="skeleton guided-skeleton"></div>
+          <div class="skeleton guided-skeleton"></div>
+        </div>
+      </section>
+
+      <section class="simple-legend">
+        <span><b class="trust canonical"></b><strong>Oficial no MCF</strong> — está no Project Registry.</span>
+        <span><b class="trust integrated"></b><strong>Integrado</strong> — relação estrutural documentada.</span>
+        <span><b class="trust referenced"></b><strong>Referenciado</strong> — citado pelo MCF, mas sem registro próprio.</span>
+        <span><b class="trust discovered"></b><strong>Descoberto</strong> — relacionado no GitHub, ainda não canônico.</span>
+      </section>
+    </section>
+
+    <section class="view-panel" id="ecosystemView" hidden>
       <div class="ecosystem-summary" id="ecosystemSummary">
         <div class="skeleton hierarchy-skeleton"></div>
       </div>
@@ -121,5 +176,6 @@
   </main>
 </div>
 <script src="/assets/app.js" defer></script>
+<script src="/assets/guided.js" defer></script>
 </body>
 </html>
