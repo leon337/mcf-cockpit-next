@@ -14,7 +14,7 @@
       <div class="brand-mark">M</div>
       <div>
         <strong>MCF Cockpit Next</strong>
-        <span>Etapa 3 · Ecossistema guiado</span>
+        <span>Etapa 4 · Fichas de projeto</span>
       </div>
     </div>
     <div class="top-actions">
@@ -30,7 +30,7 @@
         <h1>Ecossistema MCF</h1>
         <p>Comece pela visão simples para entender quem decide, quem coordena e para que serve cada parte.</p>
       </div>
-      <div class="stage-badge">ETAPA 3</div>
+      <div class="stage-badge">ETAPA 4</div>
     </section>
 
     <section class="account-card" id="accountCard" aria-live="polite">
@@ -82,7 +82,7 @@
             <span class="eyebrow">ÁREAS DO ECOSSISTEMA</span>
             <h2>Para que serve cada parte?</h2>
           </div>
-          <span class="guided-hint">Clique em uma área para ver seus projetos</span>
+          <span class="guided-hint">Abra uma área e clique em um projeto para ver sua ficha</span>
         </div>
         <div class="guided-group-grid" id="guidedGroupGrid">
           <div class="skeleton guided-skeleton"></div>
@@ -175,7 +175,55 @@
     </section>
   </main>
 </div>
+
+<dialog class="project-dialog" id="projectDialog" aria-labelledby="projectCardTitle">
+  <article class="project-game-card">
+    <header class="project-card-hero">
+      <div class="project-card-class">
+        <span class="project-card-icon" id="projectCardIcon">◌</span>
+        <div>
+          <span class="node-kicker" id="projectCardGroup">PROJETO</span>
+          <h2 id="projectCardTitle">Projeto</h2>
+          <p id="projectCardPurpose">Carregando detalhes…</p>
+        </div>
+      </div>
+      <button class="project-card-close" id="projectCardClose" type="button" aria-label="Fechar ficha">×</button>
+    </header>
+
+    <div class="project-card-trust" id="projectCardTrust"></div>
+
+    <section class="project-card-meaning">
+      <span class="project-card-section-label">ENTENDA EM 10 SEGUNDOS</span>
+      <p id="projectCardMeaning">—</p>
+    </section>
+
+    <section class="project-card-stats" id="projectCardStats"></section>
+
+    <div class="project-card-columns">
+      <section class="project-card-panel">
+        <span class="project-card-section-label">PAPEL NO MCF</span>
+        <dl class="project-card-facts" id="projectCardRole"></dl>
+      </section>
+      <section class="project-card-panel">
+        <span class="project-card-section-label">IDENTIDADE TÉCNICA</span>
+        <dl class="project-card-facts" id="projectCardTech"></dl>
+      </section>
+    </div>
+
+    <section class="project-card-panel">
+      <span class="project-card-section-label">EVIDÊNCIAS E PROVENIÊNCIA</span>
+      <div class="project-card-evidence" id="projectCardEvidence"></div>
+    </section>
+
+    <footer class="project-card-actions">
+      <span id="projectCardUpdated">—</span>
+      <a class="project-card-github" id="projectCardGithub" href="#" target="_blank" rel="noreferrer" hidden>Ver código no GitHub ↗</a>
+    </footer>
+  </article>
+</dialog>
+
 <script src="/assets/app.js" defer></script>
 <script src="/assets/guided.js" defer></script>
+<script src="/assets/project-card.js" defer></script>
 </body>
 </html>

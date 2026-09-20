@@ -77,7 +77,7 @@ function nodeTemplate(node, compact = false) {
   ` : '<div class="node-meta"><span>repositório não visível na listagem pública</span></div>';
 
   return `
-    <article class="ecosystem-node ${compact ? "compact" : ""}">
+    <button type="button" class="ecosystem-node project-trigger ${compact ? "compact" : ""}" data-project-id="${esc(node.id)}">
       <div class="node-top">
         <div>
           <span class="node-kicker">${esc(node.classification?.relationLabel || "projeto")}</span>
@@ -92,9 +92,9 @@ function nodeTemplate(node, compact = false) {
       ${repoMeta}
       <div class="node-foot">
         <span>${esc(node.registry?.path || "fora do Project Registry")}</span>
-        ${repo?.url ? `<a href="${esc(repo.url)}" target="_blank" rel="noreferrer">GitHub ↗</a>` : ""}
+        <span>${repo?.url ? "abrir ficha →" : "detalhes →"}</span>
       </div>
-    </article>
+    </button>
   `;
 }
 
@@ -184,7 +184,7 @@ function repoTemplate(node) {
       ? "Referenciado pelo MCF"
       : "Descoberto";
   return `
-    <article class="repo-card inventory-card" data-name="${esc(name.toLowerCase())}">
+    <button type="button" class="repo-card inventory-card project-trigger" data-project-id="${esc(node.id)}" data-name="${esc(name.toLowerCase())}">
       <div class="repo-card-head">
         <div class="repo-name">${esc(name)}</div>
         <span class="repo-branch">${esc(repo?.defaultBranch || node.registry?.lifecycle || "—")}</span>
@@ -198,10 +198,10 @@ function repoTemplate(node) {
       <div class="repo-footer">
         <span>${esc(node.registry?.lifecycle || "não registrado")}</span>
         ${repo?.url
-          ? `<a class="fresh" href="${esc(repo.url)}" target="_blank" rel="noreferrer">GitHub ↗</a>`
-          : '<span>sem URL pública</span>'}
+          ? '<span class="fresh">abrir ficha →</span>'
+          : '<span>abrir ficha →</span>'}
       </div>
-    </article>
+    </button>
   `;
 }
 

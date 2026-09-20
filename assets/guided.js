@@ -77,13 +77,14 @@
       (node.registry && node.registry.status === "REGISTERED"
         ? "Projeto reconhecido pelo Registry do MCF."
         : "Projeto relacionado ao ecossistema.");
-    return '<div class="guided-project">' +
+    return '<button type="button" class="guided-project project-trigger" data-project-id="' + escapeHtml(node.id) + '">' +
       '<div class="guided-project-main">' +
         '<strong>' + escapeHtml(name) + '</strong>' +
         '<small>' + escapeHtml(detail) + '</small>' +
       '</div>' +
       '<span class="trust-pill ' + t.cls + '" title="' + escapeHtml(t.help) + '">' + t.label + '</span>' +
-    '</div>';
+      '<span class="project-open-cue" aria-hidden="true">→</span>' +
+    '</button>';
   }
 
   function render(data){
