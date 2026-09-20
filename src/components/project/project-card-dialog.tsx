@@ -14,6 +14,7 @@ import {
   Wrench,
 } from "lucide-react";
 import type { ComponentType, ReactNode } from "react";
+import type { ProjectTab } from "@/domain/navigation";
 import type { EcosystemNode } from "@/data/schema";
 import {
   GROUP_PRESENTATION,
@@ -70,10 +71,14 @@ export function ProjectCardDialog({
   node,
   open,
   onOpenChange,
+  activeTab,
+  onTabChange,
 }: {
   node: EcosystemNode | null;
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  activeTab: ProjectTab;
+  onTabChange: (tab: ProjectTab) => void;
 }) {
   if (!node) return null;
 
@@ -86,10 +91,6 @@ export function ProjectCardDialog({
     repository?.description ||
     `Este projeto pertence à área “${group.title}”. ${group.short}`;
   const relations = relationInsights(node);
-  const requestedTab = new URLSearchParams(window.location.search).get("tab");
-  const defaultTab = requestedTab && ["overview", "mcf", "github", "activity"].includes(requestedTab)
-    ? requestedTab
-    : "overview";
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -115,7 +116,11 @@ export function ProjectCardDialog({
             <span className="text-sm leading-5 text-slate-500">{trust.description}</span>
           </div>
 
-          <Tabs defaultValue={defaultTab} className="mt-5">
+          <Tabs
+            value={activeTab}
+            onValueChange={(value) => onTabChange(value as ProjectTab)}
+            className="mt-5"
+          >
             <TabsList className="mb-4 w-full sm:w-max">
               <TabsTrigger value="overview">
                 <Info className="mr-2 size-4" aria-hidden="true" />
@@ -156,7 +161,7 @@ export function ProjectCardDialog({
                 <section className="rounded-2xl border border-white/10 bg-white/[0.02] p-4 sm:p-5">
                   <span className="eyebrow">STATUS RÁPIDO</span>
                   <dl className="mt-3 grid gap-2">
-                    <QuickFact label="Confiança" value={trust.label} />
+                    <QuickFact label="Proveniência" value={trust.label} />
                     <QuickFact label="Lifecycle" value={node.registry.lifecycle} />
                     <QuickFact label="Relação" value={node.classification.relationLabel} />
                   </dl>

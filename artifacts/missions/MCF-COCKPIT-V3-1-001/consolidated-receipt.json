@@ -1,0 +1,43 @@
+{
+  "mission": "MCF-COCKPIT-V3-1-001",
+  "mcfIssue": 296,
+  "project": "mcf-cockpit-next",
+  "status": "AUDIT_PASS_WITH_RESERVATIONS",
+  "baseline": "e781a71d3a6e084f5ecbcb2da773fadec94846f3",
+  "auditedFunctionalCommit": "6dd556e1cbdc18c2a3a402c1d99e1dc0794eb8cc",
+  "executionModel": "MESTRE-driven sequential workstreams with tool-backed evidence; role separation does not prove independent cognition",
+  "workstreams": [
+    {
+      "id": "WS-A",
+      "scope": "URL state, deep links, history"
+    },
+    {
+      "id": "WS-B",
+      "scope": "search semantics and read-only Mission Detail"
+    },
+    {
+      "id": "WS-C",
+      "scope": "Insights navigation and graph operability"
+    },
+    {
+      "id": "WS-D",
+      "scope": "regression, build and provider audit"
+    }
+  ],
+  "gates": {
+    "check": "PASS",
+    "build": "PASS",
+    "stage5": "PASS",
+    "v3": "PASS",
+    "v31": "PASS",
+    "renderBuild": "PASS",
+    "renderRuntime": "LIVE",
+    "freshBrowserVisualQa": "NOT_EXECUTED_EXTERNAL_TOOL_LIMIT"
+  },
+  "provider": {
+    "url": "https://mcf-cockpit-next-v31-audit.onrender.com",
+    "serviceId": "srv-dannudqjnfac73992m6g",
+    "deployId": "dep-dannueijnfac73992oa0"
+  },
+  "cognitiveIndependenceProven": false
+}

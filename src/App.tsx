@@ -1,39 +1,61 @@
-import { useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import type { EcosystemNode } from "@/data/schema";
 import { useAccount, useEcosystem } from "@/data/queries";
 import { useMissions } from "@/data/missions";
 import { InventoryView } from "@/components/ecosystem/views";
 import { ProjectCardDialog } from "@/components/project/project-card-dialog";
-import { AppShell, type V3View } from "@/components/v3/app-shell";
+import { AppShell } from "@/components/v3/app-shell";
 import { EcosystemDashboard } from "@/components/v3/ecosystem-dashboard";
 import { RelationshipGraph } from "@/components/v3/relationship-graph";
 import { MissionsView } from "@/components/v3/missions-view";
 import { InsightsView } from "@/components/v3/insights-view";
-
-const VALID_VIEWS: V3View[] = [
-  "ecosystem",
-  "graph",
-  "projects",
-  "missions",
-  "insights",
-];
+import {
+  normalizeCockpitLocation,
+  readCockpitLocation,
+  writeCockpitLocation,
+  type CockpitLocation,
+  type ProjectTab,
+  type V3View,
+} from "@/domain/navigation";
 
 export function App() {
   const account = useAccount();
   const ecosystem = useEcosystem();
   const missions = useMissions();
+  const [nav, setNav] = useState<CockpitLocation>(() => readCockpitLocation());
 
-  const [selected, setSelected] = useState<EcosystemNode | null>(null);
-  const [search, setSearch] = useState("");
-  const [activeView, setActiveView] = useState<V3View>(() => {
-    const value = new URLSearchParams(window.location.search).get("view") as V3View | null;
-    return value && VALID_VIEWS.includes(value) ? value : "ecosystem";
-  });
+  useEffect(() => {
+    const onPopState = () => setNav(readCockpitLocation());
+    window.addEventListener("popstate", onPopState);
+    return () => window.removeEventListener("popstate", onPopState);
+  }, []);
 
-  const initialProject = useMemo(
-    () => new URLSearchParams(window.location.search).get("project"),
-    [],
-  );
+  function commitNavigation(
+    patch: Partial<CockpitLocation>,
+    mode: "push" | "replace" = "push",
+  ) {
+    setNav((current) => {
+      const next = normalizeCockpitLocation({ ...current, ...patch });
+      writeCockpitLocation(next, mode);
+      return next;
+    });
+  }
+
+  function navigate(view: V3View) {
+    commitNavigation({ view }, "push");
+  }
+
+  function openProject(node: EcosystemNode) {
+    commitNavigation({ project: node.id, tab: "overview" }, "push");
+  }
+
+  function closeProject() {
+    commitNavigation({ project: null, tab: "overview" }, "replace");
+  }
+
+  function changeProjectTab(tab: ProjectTab) {
+    commitNavigation({ tab }, "replace");
+  }
 
   if (account.isLoading || ecosystem.isLoading) {
     return (
@@ -61,18 +83,9 @@ export function App() {
 
   const ecosystemData = ecosystem.data;
   const accountData = account.data.account;
-  const deepLinked = initialProject
-    ? ecosystemData.inventory.find((node) => node.id === initialProject) || null
+  const activeProject = nav.project
+    ? ecosystemData.inventory.find((node) => node.id === nav.project) || null
     : null;
-  const activeProject = selected || deepLinked;
-
-  function navigate(view: V3View) {
-    setActiveView(view);
-    const url = new URL(window.location.href);
-    url.searchParams.set("view", view);
-    if (view !== "ecosystem") url.searchParams.delete("area");
-    window.history.replaceState({}, "", url);
-  }
 
   const user = {
     name: accountData.name || accountData.login,
@@ -82,25 +95,40 @@ export function App() {
 
   return (
     <AppShell
-      activeView={activeView}
+      activeView={nav.view}
       onNavigate={navigate}
       user={user}
-      search={search}
-      onSearchChange={setSearch}
+      search={nav.q}
+      onSearchChange={(value) => commitNavigation({ q: value }, "replace")}
     >
-      {activeView === "ecosystem" ? (
+      {nav.view === "ecosystem" ? (
         <EcosystemDashboard
           data={ecosystemData}
-          onSelect={setSelected}
+          onSelect={openProject}
           missionSummary={missions.data?.counts || null}
+          search={nav.q}
+          focusedGroupId={nav.area}
+          onFocusedGroupChange={(area) => commitNavigation({ area }, "push")}
         />
       ) : null}
 
-      {activeView === "graph" ? (
-        <RelationshipGraph data={ecosystemData} onSelect={setSelected} />
+      {nav.view === "graph" ? (
+        <RelationshipGraph
+          data={ecosystemData}
+          onSelect={openProject}
+          search={nav.q}
+          groupFilter={nav.graphGroup}
+          evidenceFilter={nav.graphEvidence}
+          onGroupFilterChange={(graphGroup) =>
+            commitNavigation({ graphGroup }, "replace")
+          }
+          onEvidenceFilterChange={(graphEvidence) =>
+            commitNavigation({ graphEvidence }, "replace")
+          }
+        />
       ) : null}
 
-      {activeView === "projects" ? (
+      {nav.view === "projects" ? (
         <section className="space-y-5">
           <div>
             <span className="eyebrow">PROJETOS</span>
@@ -112,11 +140,11 @@ export function App() {
               sem sair do Cockpit.
             </p>
           </div>
-          <InventoryView data={ecosystemData} onSelect={setSelected} search={search} />
+          <InventoryView data={ecosystemData} onSelect={openProject} search={nav.q} />
         </section>
       ) : null}
 
-      {activeView === "missions" ? (
+      {nav.view === "missions" ? (
         missions.isLoading ? (
           <LoadingPanel label="Carregando missões reais…" />
         ) : missions.error || !missions.data ? (
@@ -125,25 +153,40 @@ export function App() {
             detail={String(missions.error || "A fonte pública não respondeu.")}
           />
         ) : (
-          <MissionsView data={missions.data} search={search} />
+          <MissionsView
+            data={missions.data}
+            search={nav.q}
+            filter={nav.missionFilter}
+            onFilterChange={(missionFilter) =>
+              commitNavigation({ missionFilter }, "replace")
+            }
+            selectedMissionNumber={nav.mission}
+            onSelectMission={(mission) =>
+              commitNavigation({ mission: mission.number }, "push")
+            }
+            onCloseMission={() => commitNavigation({ mission: null }, "replace")}
+          />
         )
       ) : null}
 
-      {activeView === "insights" ? (
-        <InsightsView data={ecosystemData} search={search} />
+      {nav.view === "insights" ? (
+        <InsightsView
+          data={ecosystemData}
+          search={nav.q}
+          onSelectProject={(projectId) => {
+            const node = ecosystemData.inventory.find((item) => item.id === projectId);
+            if (node) openProject(node);
+          }}
+        />
       ) : null}
 
       <ProjectCardDialog
         node={activeProject}
         open={Boolean(activeProject)}
+        activeTab={nav.tab}
+        onTabChange={changeProjectTab}
         onOpenChange={(open) => {
-          if (!open) {
-            setSelected(null);
-            const url = new URL(window.location.href);
-            url.searchParams.delete("project");
-            url.searchParams.delete("tab");
-            window.history.replaceState({}, "", url);
-          }
+          if (!open) closeProject();
         }}
       />
     </AppShell>

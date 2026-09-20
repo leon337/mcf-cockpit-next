@@ -1,0 +1,31 @@
+schema_version: 1
+mission: MCF-COCKPIT-V3-1-001
+mcf_issue: 296
+project: leon337/mcf-cockpit-next
+phase: PHASE-01-V3-1-IMPLEMENTATION
+risk_class: B
+
+baseline:
+  pre_v31_main: e781a71d3a6e084f5ecbcb2da773fadec94846f3
+  audited_functional_commit: 6dd556e1cbdc18c2a3a402c1d99e1dc0794eb8cc
+
+state:
+  implementation: COMPLETE
+  build_validation: PASS
+  render_audit: LIVE
+  fresh_browser_visual_qa: NOT_EXECUTED
+  audit: PASS_WITH_RESERVATIONS
+
+provider:
+  service_id: srv-dannudqjnfac73992m6g
+  deploy_id: dep-dannueijnfac73992oa0
+  url: https://mcf-cockpit-next-v31-audit.onrender.com
+
+invariants:
+  fabricated_data: false
+  inferred_private_metadata: false
+  fabricated_progress: false
+  execution_plane_added: false
+
+next_action: merge_candidate_after_internal_gate
+cognitiveIndependenceProven: false

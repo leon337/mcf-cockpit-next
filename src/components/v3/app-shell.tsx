@@ -10,8 +10,7 @@ import {
 } from "lucide-react";
 import { useState, type ReactNode } from "react";
 import { cn } from "@/lib/cn";
-
-export type V3View = "ecosystem" | "graph" | "projects" | "missions" | "insights";
+import type { V3View } from "@/domain/navigation";
 
 const ITEMS: Array<{
   id: V3View;
@@ -103,7 +102,7 @@ export function AppShell({
                 value={search}
                 onChange={(event) => onSearchChange(event.target.value)}
                 className="min-w-0 flex-1 bg-transparent text-sm text-white outline-none placeholder:text-slate-600"
-                placeholder="Buscar projetos, missões…"
+                placeholder={`Buscar em ${ITEMS.find((item) => item.id === activeView)?.label.toLowerCase() || "cockpit"}…`}
               />
             </label>
 
@@ -184,7 +183,7 @@ function Brand({ compact = false }: { compact?: boolean }) {
       </div>
       <div className={compact ? "hidden sm:block" : ""}>
         <strong className="block text-sm text-white">MCF Cockpit Next</strong>
-        <span className="block text-xs text-slate-500">Prototype V3</span>
+        <span className="block text-xs text-slate-500">V3.1 · Mission Control</span>
       </div>
     </div>
   );
