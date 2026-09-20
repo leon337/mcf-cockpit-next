@@ -76,12 +76,33 @@ function GroupCard({ group, onOpen }: { group: EcosystemGroup; onOpen: (groupId:
   );
 }
 
-export function GuidedView({ data, onSelect }: { data: EcosystemResponse; onSelect: SelectProject }) {
-  const [focusedGroupId, setFocusedGroupId] = useState<string | null>(() => {
-    const area = new URLSearchParams(window.location.search).get("area");
-    return area && data.groups.some((group) => group.id === area) ? area : null;
-  });
-  const focusedGroup = focusedGroupId ? data.groups.find((group) => group.id === focusedGroupId) || null : null;
+export function GuidedView({
+  data,
+  onSelect,
+  search = "",
+  focusedGroupId,
+  onFocusedGroupChange,
+}: {
+  data: EcosystemResponse;
+  onSelect: SelectProject;
+  search?: string;
+  focusedGroupId: string | null;
+  onFocusedGroupChange: (groupId: string | null) => void;
+}) {
+  const focusedGroup = focusedGroupId
+    ? data.groups.find((group) => group.id === focusedGroupId) || null
+    : null;
+  const query = search.trim().toLowerCase();
+  const visibleGroups = query
+    ? data.groups.filter(
+        (group) =>
+          [group.label, group.description, group.relationLabel]
+            .join(" ")
+            .toLowerCase()
+            .includes(query) ||
+          group.nodes.some((node) => matchesNode(node, query)),
+      )
+    : data.groups;
 
   if (focusedGroup) {
     const presentation = GROUP_PRESENTATION[focusedGroup.id] || {
@@ -96,12 +117,7 @@ export function GuidedView({ data, onSelect }: { data: EcosystemResponse; onSele
         <nav className="flex flex-wrap items-center gap-2 text-sm text-slate-500" aria-label="Navegação do ecossistema">
           <button
             type="button"
-            onClick={() => {
-              setFocusedGroupId(null);
-              const url = new URL(window.location.href);
-              url.searchParams.delete("area");
-              window.history.replaceState({}, "", url);
-            }}
+            onClick={() => onFocusedGroupChange(null)}
             className="inline-flex min-h-11 items-center gap-2 rounded-xl border border-white/10 bg-white/[0.025] px-3 text-slate-300 transition hover:bg-white/[0.06] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-400"
           >
             <ChevronLeft className="size-4" aria-hidden="true" />
@@ -148,7 +164,14 @@ export function GuidedView({ data, onSelect }: { data: EcosystemResponse; onSele
           </div>
 
           <div className="grid gap-3 lg:grid-cols-2">
-            {focusedGroup.nodes.map((node) => <ProjectRow key={node.id} node={node} onSelect={onSelect} />)}
+            {focusedGroup.nodes
+              .filter((node) => !query || matchesNode(node, query))
+              .map((node) => <ProjectRow key={node.id} node={node} onSelect={onSelect} />)}
+            {query && !focusedGroup.nodes.some((node) => matchesNode(node, query)) ? (
+              <div className="rounded-2xl border border-dashed border-white/10 p-5 text-sm text-slate-500 lg:col-span-2">
+                Nenhum projeto desta área corresponde à busca atual.
+              </div>
+            ) : null}
           </div>
         </section>
       </div>
@@ -212,16 +235,18 @@ export function GuidedView({ data, onSelect }: { data: EcosystemResponse; onSele
         </div>
 
         <div className="mt-5 grid gap-3 md:grid-cols-2 xl:grid-cols-3">
-          {data.groups.map((group) => <GroupCard
+          {visibleGroups.map((group) => (
+            <GroupCard
               key={group.id}
               group={group}
-              onOpen={(groupId) => {
-                setFocusedGroupId(groupId);
-                const url = new URL(window.location.href);
-                url.searchParams.set("area", groupId);
-                window.history.replaceState({}, "", url);
-              }}
-            />)}
+              onOpen={onFocusedGroupChange}
+            />
+          ))}
+          {query && !visibleGroups.length ? (
+            <div className="rounded-2xl border border-dashed border-white/10 p-5 text-sm text-slate-500 md:col-span-2 xl:col-span-3">
+              Nenhuma área ou projeto corresponde à busca atual.
+            </div>
+          ) : null}
         </div>
       </section>
     </div>
@@ -283,6 +308,21 @@ export function InventoryView({ data, onSelect, search = "" }: { data: Ecosystem
       </div>
     </div>
   );
+}
+
+function matchesNode(node: EcosystemNode, query: string) {
+  return [
+    node.id,
+    node.label,
+    node.repository?.name,
+    node.repository?.description,
+    node.canonicalRepository,
+    node.classification.relationLabel,
+  ]
+    .filter(Boolean)
+    .join(" ")
+    .toLowerCase()
+    .includes(query);
 }
 
 function FlowCard({ icon, label, title, detail }: { icon: string; label: string; title: string; detail: string }) {
