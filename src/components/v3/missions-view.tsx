@@ -1,17 +1,26 @@
 import { ExternalLink, MessageSquare, Search } from "lucide-react";
-import { useMemo, useState } from "react";
+import { useMemo } from "react";
 import type { Mission, MissionsResponse } from "@/data/missions";
-
-type MissionFilter = "open" | "closed" | "all";
+import type { MissionFilter } from "@/domain/navigation";
+import { MissionDetailDialog } from "@/components/v3/mission-detail-dialog";
 
 export function MissionsView({
   data,
   search = "",
+  filter,
+  onFilterChange,
+  selectedMissionNumber,
+  onSelectMission,
+  onCloseMission,
 }: {
   data: MissionsResponse;
   search?: string;
+  filter: MissionFilter;
+  onFilterChange: (filter: MissionFilter) => void;
+  selectedMissionNumber: number | null;
+  onSelectMission: (mission: Mission) => void;
+  onCloseMission: () => void;
 }) {
-  const [filter, setFilter] = useState<MissionFilter>("open");
 
   const missions = useMemo(() => {
     const q = search.trim().toLowerCase();
@@ -57,7 +66,7 @@ export function MissionsView({
           <button
             key={value}
             type="button"
-            onClick={() => setFilter(value)}
+            onClick={() => onFilterChange(value)}
             className={
               "min-h-11 rounded-xl border px-4 text-sm font-semibold transition " +
               (filter === value
@@ -80,7 +89,7 @@ export function MissionsView({
 
       <section className="grid gap-3">
         {missions.map((mission) => (
-          <MissionCard key={mission.id} mission={mission} />
+          <MissionCard key={mission.id} mission={mission} onSelect={() => onSelectMission(mission)} />
         ))}
         {!missions.length ? (
           <div className="rounded-2xl border border-dashed border-white/10 p-6 text-center text-sm text-slate-500">
@@ -93,11 +102,32 @@ export function MissionsView({
         <strong className="text-slate-400">Proveniência:</strong> {data.source}. Regra:
         {" "}{data.selection.rule}. Janela: {data.selection.window}.
       </footer>
+
+      <MissionDetailDialog
+        mission={
+          selectedMissionNumber
+            ? data.missions.find((mission) => mission.number === selectedMissionNumber) || null
+            : null
+        }
+        open={Boolean(
+          selectedMissionNumber &&
+            data.missions.some((mission) => mission.number === selectedMissionNumber),
+        )}
+        onOpenChange={(open) => {
+          if (!open) onCloseMission();
+        }}
+      />
     </div>
   );
 }
 
-function MissionCard({ mission }: { mission: Mission }) {
+function MissionCard({
+  mission,
+  onSelect,
+}: {
+  mission: Mission;
+  onSelect: () => void;
+}) {
   const labels = mission.labels.map((label) =>
     typeof label === "string" ? label : label.name
   );
@@ -147,6 +177,13 @@ function MissionCard({ mission }: { mission: Mission }) {
             <MessageSquare className="size-4" aria-hidden="true" />
             {mission.comments} comentários
           </span>
+          <button
+            type="button"
+            onClick={onSelect}
+            className="inline-flex min-h-10 items-center gap-2 rounded-xl border border-sky-400/20 bg-sky-400/[0.06] px-3 font-semibold text-sky-200 transition hover:bg-sky-400/[0.1] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-400"
+          >
+            Abrir no Cockpit
+          </button>
           <a
             href={mission.url}
             target="_blank"
