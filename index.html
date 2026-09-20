@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="color-scheme" content="dark">
+<title>MCF Cockpit Next</title>
+<link rel="stylesheet" href="/assets/styles.css">
+</head>
+<body>
+<div class="app-shell">
+  <header class="topbar">
+    <div class="brand">
+      <div class="brand-mark">M</div>
+      <div>
+        <strong>MCF Cockpit Next</strong>
+        <span>Etapa 1 · GitHub real</span>
+      </div>
+    </div>
+    <div class="top-actions">
+      <span class="source-pill" id="sourcePill">conectando…</span>
+      <button class="ghost-button" id="refreshButton" type="button">Atualizar</button>
+    </div>
+  </header>
+
+  <main class="page">
+    <section class="hero">
+      <div class="hero-copy">
+        <span class="eyebrow">MCF WORKSPACE</span>
+        <h1>Conta e repositórios</h1>
+        <p>Primeiro bloco do novo cockpit. Sem dados simulados e sem herdar o layout antigo.</p>
+      </div>
+      <div class="stage-badge">ETAPA 1</div>
+    </section>
+
+    <section class="account-card" id="accountCard" aria-live="polite">
+      <div class="skeleton account-skeleton"></div>
+    </section>
+
+    <section class="repo-section">
+      <div class="section-head">
+        <div>
+          <span class="eyebrow">ECOSSISTEMA MCF</span>
+          <h2>Repositórios</h2>
+        </div>
+        <div class="repo-tools">
+          <label class="search-box">
+            <span>⌕</span>
+            <input id="repoSearch" type="search" placeholder="Buscar repositório…" autocomplete="off">
+          </label>
+          <span class="repo-count" id="repoCount">—</span>
+        </div>
+      </div>
+
+      <div class="error-box" id="errorBox" hidden></div>
+      <div class="repo-grid" id="repoGrid">
+        <div class="skeleton repo-skeleton"></div>
+        <div class="skeleton repo-skeleton"></div>
+        <div class="skeleton repo-skeleton"></div>
+      </div>
+    </section>
+
+    <section class="provenance-card" id="provenanceCard">
+      <div>
+        <span class="eyebrow">PROVENIÊNCIA</span>
+        <h3>Origem dos dados</h3>
+      </div>
+      <div class="provenance-grid">
+        <div><span>Fonte</span><strong id="provSource">—</strong></div>
+        <div><span>Gerado</span><strong id="provGenerated">—</strong></div>
+        <div><span>Seleção</span><strong id="provSelection">—</strong></div>
+      </div>
+    </section>
+  </main>
+</div>
+<script src="/assets/app.js" defer></script>
+</body>
+</html>

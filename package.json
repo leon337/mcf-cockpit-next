@@ -1,0 +1,9 @@
+{
+  "name": "mcf-cockpit-next",
+  "version": "0.1.0",
+  "private": true,
+  "description": "MCF Cockpit Next — incremental GitHub-backed cockpit",
+  "scripts": {
+    "check": "node --check api/github.js && node --check assets/app.js"
+  }
+}

@@ -1,0 +1,19 @@
+{
+  "explicit": [
+    "multiagent-collaboration-framework",
+    "cloud-infrastructure",
+    "mcf-evaluation-lab",
+    "mcf-capture-vault",
+    "cognitive-ledger",
+    "triview-workspace-linux",
+    "predixai-robo-de-listas",
+    "mcf-cockpit-live",
+    "mcf-cockpit-next"
+  ],
+  "dynamicPrefixes": [
+    "mcf-"
+  ],
+  "dynamicTerms": [
+    "multiagent"
+  ]
+}
