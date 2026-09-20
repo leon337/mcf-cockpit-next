@@ -35,22 +35,25 @@ invariants:
 entrypoints:
   - README.md
   - docs/ARCHITECTURE.md
+  - docs/HANDOFF-MCF-COCKPIT-V3-1-001.md
   - docs/PROTOTYPE-V3.1-RESULT.md
   - docs/V3.1-EXECUTION-PLAN.md
   - src/App.tsx
 
 continuity:
   next_read:
+    - docs/HANDOFF-MCF-COCKPIT-V3-1-001.md
+    - .mcf/project-capsule.yaml
     - docs/PROTOTYPE-V3.1-RESULT.md
+    - artifacts/missions/MCF-COCKPIT-V3-1-001/consolidated-receipt.json
     - artifacts/phases/PHASE-01-V3-1-IMPLEMENTATION/README.md
     - docs/PRODUCT-REVIEW-V3-001.md
-    - docs/HANDOFF-MCF-COCKPIT-V3-001.md
-    - .mcf/project-capsule.yaml
 
 audit:
   public_url: https://mcf-cockpit-next-v31-audit.onrender.com
-  audited_commit: 6dd556e1cbdc18c2a3a402c1d99e1dc0794eb8cc
+  audited_commit: 39fd4fced5af30dc2a1f14617b0c8a0025237f11
+  implementation_merge: 3d0284de11957b476bf212dfbfd63d9c49dfac48
   render_service: srv-dannudqjnfac73992m6g
-  render_deploy: dep-dannueijnfac73992oa0
+  render_deploy: dep-dano033tqb8s73an0big
   result: PASS_WITH_RESERVATIONS
   reservation: fresh_browser_visual_qa_not_executed_due_external_tool_credit_limit
