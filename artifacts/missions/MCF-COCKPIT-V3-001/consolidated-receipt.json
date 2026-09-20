@@ -1,0 +1,192 @@
+{
+  "mission": "MCF-COCKPIT-V3-001",
+  "mcfIssue": 291,
+  "project": "mcf-cockpit-next",
+  "projectRegistryMerge": "9f5fc4e9b55867e3553c7080b4d3eb78e6887478",
+  "status": "PUBLIC_AUDIT_PASS",
+  "executionModel": "MCF-EXECUTE-LOCAL-TEAM-compatible worktree/process isolation",
+  "selectedAgents": [
+    {
+      "name": "Sofia",
+      "role": "governance/architecture"
+    },
+    {
+      "name": "Gabriel",
+      "role": "integration/release"
+    },
+    {
+      "name": "Helena",
+      "role": "frontend"
+    },
+    {
+      "name": "Isabela",
+      "role": "UI"
+    },
+    {
+      "name": "Tiago",
+      "role": "missions/data"
+    },
+    {
+      "name": "Beatriz",
+      "role": "evidence/insights"
+    },
+    {
+      "name": "Ricardo",
+      "role": "security"
+    },
+    {
+      "name": "Renato",
+      "role": "QA"
+    },
+    {
+      "name": "Marina",
+      "role": "accessibility"
+    }
+  ],
+  "workerReceipts": [
+    {
+      "workstream": "WS-A",
+      "agents": [
+        "Helena",
+        "Isabela"
+      ],
+      "pid": 355819,
+      "commit": "6e2de412144699f35d057adb42d662f2285cb042"
+    },
+    {
+      "workstream": "WS-B",
+      "agents": [
+        "Tiago",
+        "Helena"
+      ],
+      "pid": 356166,
+      "commit": "e251ebcb2b67b9c924ce4ac2136f0beb8ee0c5fc"
+    },
+    {
+      "workstream": "WS-C",
+      "agents": [
+        "Beatriz",
+        "Ricardo"
+      ],
+      "pid": 356424,
+      "commit": "3afbbed555737acc3a926ecc062a4d0900062a3d"
+    },
+    {
+      "workstream": "WS-D",
+      "agents": [
+        "Renato",
+        "Marina"
+      ],
+      "pid": 356627,
+      "commit": "2fcb0b1ffa7a3a478ddfce68176e358d49df0b5e"
+    }
+  ],
+  "dataEvidence": {
+    "ecosystem": {
+      "nodes": 20,
+      "groups": 7
+    },
+    "missions": {
+      "total": 19,
+      "open": 11,
+      "closed": 8,
+      "mission291Present": true
+    },
+    "missionSource": "GitHub Issues — leon337/multiagent-collaboration-framework"
+  },
+  "gates": {
+    "typecheck": "PASS",
+    "viteBuild": "PASS",
+    "v3Verifier": "28/28 PASS",
+    "stage5Regression": "10/10 PASS",
+    "apiSyntax": "PASS",
+    "gitDiffCheck": "PASS",
+    "privateProjectBoundary": "PASS"
+  },
+  "browserQa": [
+    {
+      "case": "ecosystem",
+      "status": "PASS",
+      "areas": 7
+    },
+    {
+      "case": "graph",
+      "status": "PASS",
+      "provenance": true,
+      "dependencyGuard": true
+    },
+    {
+      "case": "missions",
+      "status": "PASS",
+      "mission291": true
+    },
+    {
+      "case": "insights",
+      "status": "PASS",
+      "rulesVisible": true,
+      "noHealthScore": true
+    },
+    {
+      "case": "private-project",
+      "status": "PASS",
+      "githubAction": false
+    },
+    {
+      "viewport": "500x705",
+      "view": "graph",
+      "overflow": false,
+      "sidebar": "none",
+      "bottomNav": "grid",
+      "graphOverflowX": "auto"
+    },
+    {
+      "viewport": "500x705",
+      "view": "project-dialog",
+      "overflow": false,
+      "dialogInside": true,
+      "bodyFont": "16px",
+      "dialogTitle": "24px"
+    },
+    {
+      "viewport": "768x885",
+      "view": "missions",
+      "overflow": false,
+      "sidebar": "none",
+      "bottomNav": "grid"
+    },
+    {
+      "viewport": "1440x761",
+      "view": "project-dialog",
+      "overflow": false,
+      "sidebar": "flex",
+      "bottomNav": "none",
+      "dialogInside": true,
+      "dialogTitle": "30px"
+    },
+    {
+      "viewport": "1920x941",
+      "view": "ecosystem",
+      "overflow": false,
+      "sidebar": "flex",
+      "bodyFont": "18px"
+    }
+  ],
+  "cognitiveIndependenceProven": false,
+  "publicAudit": {
+    "url": "https://mcf-cockpit-next-v3-audit.onrender.com",
+    "renderDeployId": "dep-danm5bmgekts739duidg",
+    "auditedCommit": "da19df5b817214c16a6507c10562420c1fbb1102",
+    "http": {
+      "root": 200,
+      "ecosystem": 200,
+      "missions": 200
+    },
+    "surfaces": {
+      "ecosystem": "PASS",
+      "graph": "PASS",
+      "missions": "PASS",
+      "insights": "PASS",
+      "privateProject": "PASS"
+    }
+  }
+}

@@ -8,6 +8,10 @@
     {
       "source": "/api/ecosystem",
       "destination": "/api/ecosystem.js"
+    },
+    {
+      "source": "/api/missions",
+      "destination": "/api/missions.js"
     }
   ],
   "headers": [

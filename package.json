@@ -12,8 +12,9 @@
     "preview": "vite preview --host 0.0.0.0",
     "start": "node server.js",
     "typecheck": "tsc --noEmit",
-    "check": "npm run typecheck && node --check api/github.js && node --check api/ecosystem.js && node --check server.js",
-    "test:stage5": "node scripts/verify-stage5.mjs"
+    "check": "npm run typecheck && node --check api/github.js && node --check api/ecosystem.js && node --check api/missions.js && node --check server.js",
+    "test:stage5": "node scripts/verify-stage5.mjs",
+    "test:v3": "node scripts/verify-v3.mjs"
   },
   "dependencies": {
     "@radix-ui/react-accordion": "^1.2.11",

@@ -3,6 +3,7 @@ const fs = require("fs");
 const path = require("path");
 const githubHandler = require("./api/github.js");
 const ecosystemHandler = require("./api/ecosystem.js");
+const missionsHandler = require("./api/missions.js");
 
 const ROOT = __dirname;
 const DIST = path.join(ROOT, "dist");
@@ -57,6 +58,7 @@ http.createServer((req, res) => {
   const url = new URL(req.url, "http://localhost");
   if (url.pathname === "/api/github") return apiAdapter(githubHandler, req, res);
   if (url.pathname === "/api/ecosystem") return apiAdapter(ecosystemHandler, req, res);
+  if (url.pathname === "/api/missions") return apiAdapter(missionsHandler, req, res);
 
   const relative = url.pathname === "/" ? "/index.html" : url.pathname;
   const candidate = path.resolve(STATIC_ROOT, "." + relative);
