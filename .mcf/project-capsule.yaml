@@ -1,0 +1,41 @@
+schema_version: 1
+
+project:
+  id: mcf-cockpit-next
+  repository: leon337/mcf-cockpit-next
+  owner: LEANDRO
+  mission: MCF-COCKPIT-V3-001
+  mcf_issue: 291
+
+purpose:
+  statement: Visualizar, compreender e operar o ecossistema MCF a partir de dados reais, proveniência explícita e navegação orientada a missões.
+
+current_phase:
+  name: Prototype V3
+  objective: Evoluir do mapa/ficha V2 para Mission Control visual com grafo, missões reais e insights determinísticos.
+  status: IN_PROGRESS
+
+source_of_truth:
+  - api/ecosystem.js
+  - api/github.js
+  - context/projects no MCF
+  - docs/MCF-CURRENT-STATE.md no MCF
+  - issues públicas do multiagent-collaboration-framework
+
+invariants:
+  - no_fabricated_data
+  - no_inferred_private_metadata
+  - github_secondary_action
+  - explicit_relation_evidence
+  - stack_frozen_react_typescript_vite_tailwind_radix_tanstack_zod
+
+entrypoints:
+  - README.md
+  - docs/ARCHITECTURE.md
+  - docs/V3-EXECUTION-PLAN.md
+  - src/App.tsx
+
+continuity:
+  next_read:
+    - docs/V3-EXECUTION-PLAN.md
+    - .mcf/project-capsule.yaml
