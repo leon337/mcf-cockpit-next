@@ -37,8 +37,12 @@ entrypoints:
 
 continuity:
   next_read:
-    - docs/V3-EXECUTION-PLAN.md
+    - docs/HANDOFF-MCF-COCKPIT-V3-001.md
     - .mcf/project-capsule.yaml
+    - docs/PROTOTYPE-V3-RESULT.md
+    - artifacts/missions/MCF-COCKPIT-V3-001/consolidated-receipt.json
+    - docs/V3-QA-CONTRACT.md
+    - docs/V3-EXECUTION-PLAN.md
 
 audit:
   public_url: https://mcf-cockpit-next-v3-audit.onrender.com
