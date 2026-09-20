@@ -252,10 +252,18 @@ function switchView(view) {
   $$(".view-tab").forEach(button => {
     button.classList.toggle("active", button.dataset.view === view);
   });
-  $("#ecosystemView").hidden = view !== "ecosystem";
-  $("#repositoriesView").hidden = view !== "repositories";
-  $("#ecosystemView").classList.toggle("active", view === "ecosystem");
-  $("#repositoriesView").classList.toggle("active", view === "repositories");
+
+  const guided = $("#guidedView");
+  const technical = $("#ecosystemView");
+  const repositories = $("#repositoriesView");
+
+  guided.hidden = view !== "guided";
+  technical.hidden = view !== "technical";
+  repositories.hidden = view !== "repositories";
+
+  guided.classList.toggle("active", view === "guided");
+  technical.classList.toggle("active", view === "technical");
+  repositories.classList.toggle("active", view === "repositories");
 }
 
 async function loadData() {
