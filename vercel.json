@@ -4,6 +4,10 @@
     {
       "source": "/api/github",
       "destination": "/api/github.js"
+    },
+    {
+      "source": "/api/ecosystem",
+      "destination": "/api/ecosystem.js"
     }
   ],
   "headers": [

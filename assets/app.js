@@ -1,5 +1,8 @@
 const $ = s => document.querySelector(s);
-let DATA = null;
+const $$ = s => [...document.querySelectorAll(s)];
+
+let ACCOUNT_DATA = null;
+let ECOSYSTEM_DATA = null;
 
 function esc(value) {
   return String(value ?? "").replace(/[&<>"']/g, char => ({
@@ -17,14 +20,6 @@ function ago(value) {
   const hours = Math.round(minutes / 60);
   if (hours < 24) return `há ${hours} h`;
   return `há ${Math.round(hours / 24)} d`;
-}
-
-function dateTime(value) {
-  if (!value) return "—";
-  return new Date(value).toLocaleString("pt-BR", {
-    dateStyle: "short",
-    timeStyle: "short"
-  });
 }
 
 function accountTemplate(account) {
@@ -47,83 +42,258 @@ function accountTemplate(account) {
   `;
 }
 
-function repoTemplate(repo) {
-  const language = repo.language || "Sem linguagem";
-  const description = repo.description || "Sem descrição pública.";
+function lifecycleBadge(node) {
+  const lifecycle = node.registry?.lifecycle;
+  if (!lifecycle) return "";
+  const cls = lifecycle === "ACTIVE" ? "active" :
+    lifecycle === "CANDIDATE" ? "candidate" : "registered";
+  return `<span class="node-badge ${cls}">${esc(lifecycle)}</span>`;
+}
+
+function evidenceBadges(node) {
+  const out = [];
+  if (node.registry?.status === "REGISTERED") {
+    out.push('<span class="node-badge canonical">Registry MCF</span>');
+  } else if (node.registry?.status === "REFERENCED_NOT_REGISTERED") {
+    out.push('<span class="node-badge referenced">Referenciado pelo MCF</span>');
+  } else {
+    out.push('<span class="node-badge discovered">GitHub descoberto</span>');
+  }
+  if ((node.evidence || []).includes("MCF_CURRENT_STATE_CF_4_OF_4")) {
+    out.push('<span class="node-badge integrated">Context Fabric 4/4</span>');
+  }
+  return out.join("");
+}
+
+function nodeTemplate(node, compact = false) {
+  const repo = node.repository;
+  const description = repo?.description || "Sem descrição pública.";
+  const repoMeta = repo ? `
+    <div class="node-meta">
+      <span>${esc(repo.defaultBranch || "—")}</span>
+      <span>${esc(repo.language || "sem linguagem")}</span>
+      <span>Atualizado ${ago(repo.updatedAt)}</span>
+    </div>
+  ` : '<div class="node-meta"><span>repositório não visível na listagem pública</span></div>';
+
   return `
-    <a class="repo-card" href="${esc(repo.url)}" target="_blank" rel="noreferrer" data-name="${esc(repo.name.toLowerCase())}">
-      <div class="repo-card-head">
-        <div class="repo-name">${esc(repo.name)}</div>
-        <span class="repo-branch">${esc(repo.defaultBranch || "—")}</span>
+    <article class="ecosystem-node ${compact ? "compact" : ""}">
+      <div class="node-top">
+        <div>
+          <span class="node-kicker">${esc(node.classification?.relationLabel || "projeto")}</span>
+          <h4>${esc(node.label)}</h4>
+        </div>
+        <div class="node-badges">
+          ${evidenceBadges(node)}
+          ${lifecycleBadge(node)}
+        </div>
       </div>
-      <div class="repo-description">${esc(description)}</div>
-      <div class="repo-meta">
-        <span>${esc(language)}</span>
-        <span>★ ${repo.stars}</span>
-        <span>⑂ ${repo.forks}</span>
-        <span>◉ ${repo.openIssues}</span>
+      <p>${esc(description)}</p>
+      ${repoMeta}
+      <div class="node-foot">
+        <span>${esc(node.registry?.path || "fora do Project Registry")}</span>
+        ${repo?.url ? `<a href="${esc(repo.url)}" target="_blank" rel="noreferrer">GitHub ↗</a>` : ""}
       </div>
-      <div class="repo-footer">
-        <span>${repo.archived ? "arquivado" : "público"}</span>
-        <span class="fresh">Atualizado ${ago(repo.updatedAt)}</span>
-      </div>
-    </a>
+    </article>
   `;
 }
 
-function renderRepositories(query = "") {
-  if (!DATA) return;
+function renderAuthority(data) {
+  $("#authorityNode").innerHTML = `
+    <span class="node-kicker">AUTORIDADE HUMANA FINAL</span>
+    <strong>${esc(data.authority.label)}</strong>
+    <small>${esc(data.authority.role)}</small>
+  `;
+}
+
+function renderCore(data) {
+  const node = data.core;
+  $("#coreNode").innerHTML = `
+    <div class="core-icon">MCF</div>
+    <div class="core-body">
+      <span class="node-kicker">NÚCLEO</span>
+      <div class="core-title-row">
+        <h2>${esc(node.label)}</h2>
+        <div class="node-badges">${evidenceBadges(node)}${lifecycleBadge(node)}</div>
+      </div>
+      <p>${esc(node.repository?.description || "Framework multiagente governado e runtime canônico.")}</p>
+      <div class="node-meta">
+        <span>${esc(node.canonicalRepository)}</span>
+        <span>${esc(node.registry.operationalState || "—")}</span>
+        <span>Atualizado ${ago(node.repository?.updatedAt)}</span>
+      </div>
+      <div class="core-actions">
+        <span class="relation-pill">governança</span>
+        <span class="relation-pill">runtime</span>
+        <span class="relation-pill">context fabric</span>
+        <span class="relation-pill">skills/adapters</span>
+      </div>
+    </div>
+  `;
+}
+
+function renderGroups(data) {
+  $("#groupGrid").innerHTML = data.groups.map(group => `
+    <section class="ecosystem-group" data-group="${esc(group.id)}">
+      <header class="group-head">
+        <div>
+          <span class="node-kicker">${esc(group.sourceType)}</span>
+          <h3>${esc(group.label)}</h3>
+        </div>
+        <span class="group-count">${group.nodes.length}</span>
+      </header>
+      <p class="group-description">${esc(group.description)}</p>
+      <div class="group-relation"><span>MCF Core</span><i></i><b>${esc(group.relationLabel)}</b></div>
+      <div class="group-nodes">
+        ${group.nodes.length
+          ? group.nodes.map(node => nodeTemplate(node, true)).join("")
+          : '<div class="empty-group">Nenhum nó público encontrado.</div>'}
+      </div>
+    </section>
+  `).join("");
+}
+
+function renderSummary(data) {
+  const c = data.counts;
+  $("#ecosystemSummary").innerHTML = `
+    <div class="summary-card"><strong>${c.registryProjects}</strong><span>projetos no Registry</span></div>
+    <div class="summary-card"><strong>${data.structuralRecoveryCore.length}</strong><span>núcleo estrutural 4/4</span></div>
+    <div class="summary-card"><strong>${c.discoveredUnregistered}</strong><span>descobertos fora do Registry</span></div>
+    <div class="summary-card"><strong>${c.referencedNotRegistered || 0}</strong><span>referenciados, não registrados</span></div>
+    <div class="summary-card"><strong>${c.totalNodes}</strong><span>nós no mapa</span></div>
+  `;
+}
+
+function dedupInventory(data) {
+  const seen = new Set();
+  return data.inventory.filter(node => {
+    const key = node.repository?.fullName || node.canonicalRepository || node.id;
+    if (seen.has(key)) return false;
+    seen.add(key);
+    return true;
+  });
+}
+
+function repoTemplate(node) {
+  const repo = node.repository;
+  const name = repo?.name || node.canonicalRepository || node.id;
+  const description = repo?.description || "Repositório registrado, mas sem metadados públicos carregados.";
+  const status = node.registry?.status === "REGISTERED"
+    ? "Registry MCF"
+    : node.registry?.status === "REFERENCED_NOT_REGISTERED"
+      ? "Referenciado pelo MCF"
+      : "Descoberto";
+  return `
+    <article class="repo-card inventory-card" data-name="${esc(name.toLowerCase())}">
+      <div class="repo-card-head">
+        <div class="repo-name">${esc(name)}</div>
+        <span class="repo-branch">${esc(repo?.defaultBranch || node.registry?.lifecycle || "—")}</span>
+      </div>
+      <div class="repo-description">${esc(description)}</div>
+      <div class="repo-meta">
+        <span>${esc(status)}</span>
+        <span>${esc(node.classification?.relationLabel || "—")}</span>
+        ${repo ? `<span>★ ${repo.stars}</span><span>◉ ${repo.openIssues}</span>` : ""}
+      </div>
+      <div class="repo-footer">
+        <span>${esc(node.registry?.lifecycle || "não registrado")}</span>
+        ${repo?.url
+          ? `<a class="fresh" href="${esc(repo.url)}" target="_blank" rel="noreferrer">GitHub ↗</a>`
+          : '<span>sem URL pública</span>'}
+      </div>
+    </article>
+  `;
+}
+
+function renderInventory(query = "") {
+  if (!ECOSYSTEM_DATA) return;
   const needle = query.trim().toLowerCase();
-  const repos = DATA.repositories.filter(repo => {
-    if (!needle) return true;
-    return [
-      repo.name,
-      repo.description,
-      repo.language,
-      repo.defaultBranch
-    ].some(value => String(value || "").toLowerCase().includes(needle));
+  const nodes = dedupInventory(ECOSYSTEM_DATA).filter(node => {
+    const haystack = [
+      node.id,
+      node.label,
+      node.repository?.name,
+      node.repository?.description,
+      node.canonicalRepository,
+      node.classification?.relationLabel,
+      node.registry?.lifecycle
+    ].join(" ").toLowerCase();
+    return !needle || haystack.includes(needle);
   });
 
-  $("#repoCount").textContent = repos.length;
-  $("#repoGrid").innerHTML = repos.length
-    ? repos.map(repoTemplate).join("")
+  $("#repoCount").textContent = nodes.length;
+  $("#repoGrid").innerHTML = nodes.length
+    ? nodes.map(repoTemplate).join("")
     : '<div class="empty">Nenhum repositório corresponde à busca.</div>';
 }
 
-function render(data) {
-  DATA = data;
-  $("#accountCard").innerHTML = accountTemplate(data.account);
-  renderRepositories($("#repoSearch").value);
-  $("#sourcePill").textContent = `GitHub real · ${ago(data.generatedAt)}`;
-  $("#provSource").textContent = data.source;
-  $("#provGenerated").textContent = dateTime(data.generatedAt);
-  const s = data.selection;
-  $("#provSelection").textContent =
-    `${s.explicitNames.length} nomes explícitos + prefixos/termos dinâmicos`;
+function renderProvenance(data) {
+  $("#provRegistry").textContent = data.sources.registry;
+  $("#provCurrentState").textContent = data.sources.currentState;
+  $("#provGithub").textContent = data.sources.github;
+}
+
+function renderAll(accountData, ecosystemData) {
+  ACCOUNT_DATA = accountData;
+  ECOSYSTEM_DATA = ecosystemData;
+
+  $("#accountCard").innerHTML = accountTemplate(accountData.account);
+  $("#sourcePill").textContent = `Registry + GitHub live · ${ago(ecosystemData.generatedAt)}`;
+
+  renderAuthority(ecosystemData);
+  renderCore(ecosystemData);
+  renderGroups(ecosystemData);
+  renderSummary(ecosystemData);
+  renderInventory($("#repoSearch").value);
+  renderProvenance(ecosystemData);
+}
+
+function switchView(view) {
+  $$(".view-tab").forEach(button => {
+    button.classList.toggle("active", button.dataset.view === view);
+  });
+  $("#ecosystemView").hidden = view !== "ecosystem";
+  $("#repositoriesView").hidden = view !== "repositories";
+  $("#ecosystemView").classList.toggle("active", view === "ecosystem");
+  $("#repositoriesView").classList.toggle("active", view === "repositories");
 }
 
 async function loadData() {
   $("#refreshButton").disabled = true;
   $("#errorBox").hidden = true;
+
   try {
-    const response = await fetch("/api/github", {
-      headers: { Accept: "application/json" }
-    });
-    const data = await response.json();
-    if (!response.ok || !data.ok) {
-      throw new Error(data.message || data.error || `HTTP ${response.status}`);
+    const [accountResponse, ecosystemResponse] = await Promise.all([
+      fetch("/api/github", { headers: { Accept: "application/json" } }),
+      fetch("/api/ecosystem", { headers: { Accept: "application/json" } })
+    ]);
+
+    const [accountData, ecosystemData] = await Promise.all([
+      accountResponse.json(),
+      ecosystemResponse.json()
+    ]);
+
+    if (!accountResponse.ok || !accountData.ok) {
+      throw new Error(accountData.message || accountData.error || `GitHub HTTP ${accountResponse.status}`);
     }
-    render(data);
+    if (!ecosystemResponse.ok || !ecosystemData.ok) {
+      throw new Error(ecosystemData.message || ecosystemData.error || `Ecosystem HTTP ${ecosystemResponse.status}`);
+    }
+
+    renderAll(accountData, ecosystemData);
   } catch (error) {
     $("#errorBox").hidden = false;
-    $("#errorBox").textContent = `Não foi possível carregar os dados do GitHub: ${error.message}`;
-    $("#repoGrid").innerHTML = '<div class="empty">Dados indisponíveis no momento.</div>';
-    $("#sourcePill").textContent = "GitHub indisponível";
+    $("#errorBox").textContent = `Não foi possível carregar a hierarquia: ${error.message}`;
+    $("#sourcePill").textContent = "dados indisponíveis";
   } finally {
     $("#refreshButton").disabled = false;
   }
 }
 
-$("#repoSearch").addEventListener("input", event => renderRepositories(event.target.value));
+$$(".view-tab").forEach(button => {
+  button.addEventListener("click", () => switchView(button.dataset.view));
+});
+$("#repoSearch").addEventListener("input", event => renderInventory(event.target.value));
 $("#refreshButton").addEventListener("click", loadData);
+
 loadData();

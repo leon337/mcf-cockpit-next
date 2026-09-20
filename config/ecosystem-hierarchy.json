@@ -1,0 +1,114 @@
+{
+  "authority": {
+    "id": "LEANDRO",
+    "label": "LEANDRO",
+    "role": "Autoridade humana final",
+    "source": "MCF governance"
+  },
+  "coreProjectId": "multiagent-collaboration-framework",
+  "structuralRecoveryCore": [
+    "multiagent-collaboration-framework",
+    "cloud-infrastructure",
+    "cognitive-ledger",
+    "triview-workspace-linux"
+  ],
+  "groups": [
+    {
+      "id": "foundation",
+      "label": "Fundação integrada",
+      "description": "Projetos com integração estrutural explícita no Context Fabric 4/4.",
+      "relationLabel": "integração estrutural",
+      "sourceType": "MCF_CURRENT_STATE",
+      "projectIds": [
+        "cloud-infrastructure",
+        "cognitive-ledger",
+        "triview-workspace-linux"
+      ]
+    },
+    {
+      "id": "execution",
+      "label": "Execução e inteligência",
+      "description": "Projetos registrados que fornecem execução, navegação/agentes, workstation ou inteligência de modelos.",
+      "relationLabel": "capacidade operacional",
+      "sourceType": "COCKPIT_VIEW_MODEL",
+      "projectIds": [
+        "mcf-model-intelligence",
+        "leon337-hermes-operator",
+        "dsh-client-ui-agent-nav",
+        "leandro-workstation-mcp"
+      ]
+    },
+    {
+      "id": "continuity",
+      "label": "Memória e continuidade",
+      "description": "Projetos registrados focados em continuidade de contexto e memória de projeto.",
+      "relationLabel": "continuidade",
+      "sourceType": "COCKPIT_VIEW_MODEL",
+      "projectIds": [
+        "project-memory"
+      ]
+    },
+    {
+      "id": "applications",
+      "label": "Produtos e casos",
+      "description": "Projetos registrados ou descobertos que usam o MCF em produtos, cursos ou casos concretos.",
+      "relationLabel": "aplicação/case",
+      "sourceType": "COCKPIT_VIEW_MODEL",
+      "projectIds": [
+        "controle-ponto-frontend",
+        "curso-instavar",
+        "arvore-presente-digital-twin"
+      ],
+      "discoveredRepositories": [
+        "predixai-robo-de-listas"
+      ]
+    },
+    {
+      "id": "labs",
+      "label": "Laboratórios",
+      "description": "Repositórios públicos relacionados ao MCF, ainda não encontrados no Project Registry atual.",
+      "relationLabel": "pesquisa/avaliação",
+      "sourceType": "DISCOVERED_GITHUB",
+      "discoveredRepositories": [
+        "mcf-evaluation-lab",
+        "mcf-product-lab"
+      ]
+    },
+    {
+      "id": "interfaces",
+      "label": "Interfaces e observabilidade",
+      "description": "Cockpits, painéis e superfícies públicas descobertas no GitHub; não são automaticamente núcleo canônico.",
+      "relationLabel": "interface/observação",
+      "sourceType": "DISCOVERED_GITHUB",
+      "discoveredRepositories": [
+        "mcf-cockpit-next",
+        "mcf-cockpit-live",
+        "mcf-long-mission-public",
+        "mcf-control-center"
+      ]
+    },
+    {
+      "id": "support",
+      "label": "Ferramentas de suporte",
+      "description": "Ferramentas referenciadas por projetos MCF ou usadas na operação, sem equivaler ao núcleo.",
+      "relationLabel": "suporte",
+      "sourceType": "COCKPIT_VIEW_MODEL",
+      "discoveredRepositories": [
+        "voicehub-linux"
+      ],
+      "referencedRepositories": [
+        {
+          "name": "voicehub-linux",
+          "fullName": "leon337/voicehub-linux",
+          "sourcePath": "context/projects/controle-ponto-frontend.yaml",
+          "reference": "communications.voicehub.canonical_repository"
+        }
+      ]
+    }
+  ],
+  "provenance": {
+    "registryRoot": "context/projects/",
+    "currentStatePath": "docs/MCF-CURRENT-STATE.md",
+    "note": "As relações de grupo são um modelo de navegação do Cockpit. Registro, lifecycle e repositório canônico vêm do MCF; métricas vêm do GitHub."
+  }
+}
