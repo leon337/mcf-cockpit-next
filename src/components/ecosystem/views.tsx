@@ -250,8 +250,9 @@ export function TechnicalView({ data, onSelect }: { data: EcosystemResponse; onS
   );
 }
 
-export function InventoryView({ data, onSelect }: { data: EcosystemResponse; onSelect: SelectProject }) {
+export function InventoryView({ data, onSelect, search = "" }: { data: EcosystemResponse; onSelect: SelectProject; search?: string }) {
   const [query, setQuery] = useState("");
+  const effectiveQuery = search || query;
   const nodes = useMemo(() => {
     const seen = new Set<string>();
     return data.inventory.filter((node) => {
@@ -260,9 +261,9 @@ export function InventoryView({ data, onSelect }: { data: EcosystemResponse; onS
       seen.add(key);
       const haystack = [node.id, node.label, node.repository?.name, node.repository?.description, node.canonicalRepository]
         .filter(Boolean).join(" ").toLowerCase();
-      return !query || haystack.includes(query.toLowerCase());
+      return !effectiveQuery || haystack.includes(effectiveQuery.toLowerCase());
     });
-  }, [data, query]);
+  }, [data, effectiveQuery]);
 
   return (
     <div>

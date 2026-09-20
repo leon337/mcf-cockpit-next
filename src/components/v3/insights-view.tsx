@@ -1,3 +1,4 @@
+import type { ReactNode } from "react";
 import { AlertTriangle, Info, Lightbulb, ShieldCheck } from "lucide-react";
 import type { EcosystemResponse } from "@/data/schema";
 import {
@@ -172,7 +173,7 @@ function SummaryCard({
 }: {
   value: number;
   label: string;
-  icon: React.ReactNode;
+  icon: ReactNode;
   tone: "sky" | "amber" | "violet" | "slate";
 }) {
   const style = {

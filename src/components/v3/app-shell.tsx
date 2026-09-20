@@ -162,7 +162,7 @@ export function AppShell({
               type="button"
               onClick={() => navigate(item.id)}
               className={cn(
-                "flex min-h-12 flex-col items-center justify-center gap-1 rounded-xl px-1 text-[11px] font-semibold transition",
+                "flex min-h-12 flex-col items-center justify-center gap-1 rounded-xl px-1 text-xs font-semibold transition",
                 active ? "bg-sky-400/10 text-sky-200" : "text-slate-500 hover:text-slate-300",
               )}
             >
