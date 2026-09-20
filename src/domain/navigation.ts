@@ -31,7 +31,7 @@ function enumValue<T extends readonly string[]>(
   value: string | null,
   fallback: T[number],
 ): T[number] {
-  return value && values.includes(value) ? (value as T[number]) : fallback;
+  return value && (values as readonly string[]).includes(value) ? (value as T[number]) : fallback;
 }
 
 export function readCockpitLocation(href = window.location.href): CockpitLocation {
@@ -92,8 +92,11 @@ export function writeCockpitLocation(
   setOrDelete(url, "graphGroup", normalized.graphGroup);
   setOrDelete(url, "graphEvidence", normalized.graphEvidence);
 
-  const method = mode === "push" ? "pushState" : "replaceState";
-  window.history[method]({ cockpit: true }, "", url);
+  if (mode === "push") {
+    window.history.pushState({ cockpit: true }, "", url);
+  } else {
+    window.history.replaceState({ cockpit: true }, "", url);
+  }
 }
 
 function setOrDelete(url: URL, key: string, value: string | null) {
