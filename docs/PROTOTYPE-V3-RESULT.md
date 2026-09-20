@@ -56,5 +56,10 @@ cognitiveIndependenceProven=false.
 
 ## Current state
 
-Code and local browser QA are green.
-Public audit deployment is the next gate.
+Code, local browser QA and public Render audit are green.
+
+Public audit: https://mcf-cockpit-next-v3-audit.onrender.com
+
+Audited product commit: da19df5b817214c16a6507c10562420c1fbb1102
+
+Render deploy: dep-danm5bmgekts739duidg

@@ -3,7 +3,7 @@
   "mcfIssue": 291,
   "project": "mcf-cockpit-next",
   "projectRegistryMerge": "9f5fc4e9b55867e3553c7080b4d3eb78e6887478",
-  "status": "LOCAL_VALIDATED_AUDIT_PENDING",
+  "status": "PUBLIC_AUDIT_PASS",
   "executionModel": "MCF-EXECUTE-LOCAL-TEAM-compatible worktree/process isolation",
   "selectedAgents": [
     {
@@ -171,5 +171,22 @@
       "bodyFont": "18px"
     }
   ],
-  "cognitiveIndependenceProven": false
+  "cognitiveIndependenceProven": false,
+  "publicAudit": {
+    "url": "https://mcf-cockpit-next-v3-audit.onrender.com",
+    "renderDeployId": "dep-danm5bmgekts739duidg",
+    "auditedCommit": "da19df5b817214c16a6507c10562420c1fbb1102",
+    "http": {
+      "root": 200,
+      "ecosystem": 200,
+      "missions": 200
+    },
+    "surfaces": {
+      "ecosystem": "PASS",
+      "graph": "PASS",
+      "missions": "PASS",
+      "insights": "PASS",
+      "privateProject": "PASS"
+    }
+  }
 }
