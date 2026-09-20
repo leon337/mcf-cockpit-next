@@ -52,7 +52,7 @@ export function App() {
             <div className="grid size-11 place-items-center rounded-2xl bg-gradient-to-br from-blue-500 to-violet-500 text-base font-black text-white shadow-lg shadow-blue-500/20">M</div>
             <div>
               <strong className="block text-base text-white">MCF Cockpit Next</strong>
-              <span className="block text-sm text-slate-500">React + TypeScript · framework migration</span>
+              <span className="block text-sm text-slate-500">Prototype V2 · mapa navegável + fichas evoluídas</span>
             </div>
           </div>
           <Button variant="secondary" onClick={refresh}>
