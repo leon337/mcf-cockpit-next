@@ -5,10 +5,16 @@ export function EcosystemDashboard({
   data,
   onSelect,
   missionSummary,
+  search,
+  focusedGroupId,
+  onFocusedGroupChange,
 }: {
   data: EcosystemResponse;
   onSelect: (node: EcosystemNode) => void;
   missionSummary?: { open: number; closed: number } | null;
+  search: string;
+  focusedGroupId: string | null;
+  onFocusedGroupChange: (groupId: string | null) => void;
 }) {
   const registered = data.counts.registryProjects;
   const integrated = data.structuralRecoveryCore.length;
@@ -46,7 +52,13 @@ export function EcosystemDashboard({
         />
       </section>
 
-      <GuidedView data={data} onSelect={onSelect} />
+      <GuidedView
+        data={data}
+        onSelect={onSelect}
+        search={search}
+        focusedGroupId={focusedGroupId}
+        onFocusedGroupChange={onFocusedGroupChange}
+      />
     </div>
   );
 }
