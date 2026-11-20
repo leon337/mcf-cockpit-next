@@ -46,6 +46,15 @@ Cockpit UI público [pareamento privado obrigatório]
   com trace UUID e até 30 eventos locais sanitizados. **Nunca** enviar
   access/refresh token, chave OAuth, bearer, segredo de sessão, conteúdo
   de Gmail/Drive, nome de usuário ou variáveis de ambiente.
+- **Consistência transacional:** o registro do nonce e a publicação do snapshot
+  agora são uma única instrução SQL com CTE. Se a publicação falhar,
+  o recibo anti-replay também é revertido; um nonce já usado não atualiza
+  o snapshot.
+- **Privilégio mínimo verificado:** a role `mcf_bridge_gateway` possui
+  apenas `SELECT`, `INSERT` e `UPDATE` nas três tabelas do schema;
+  o privilégio `DELETE` foi revogado e a role não lê
+  `public.mcf_records`. O plano SQL atômico foi validado por `EXPLAIN`
+  no Neon **sem execução** (sem modificar registros).
 - **Persistência:** schema isolado `mcf_bridge` do projeto Neon
   `mcf-central-operacoes`; tabelas `snapshots`, `ingest_receipts`,
   `auth_limits`. Role `mcf_bridge_gateway` limitada ao schema
