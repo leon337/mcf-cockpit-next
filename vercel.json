@@ -16,6 +16,14 @@
     {
       "source": "/api/google-bridge",
       "destination": "/api/google-bridge.js"
+    },
+    {
+      "source": "/api/google-bridge-login",
+      "destination": "/api/google-bridge-login.js"
+    },
+    {
+      "source": "/api/google-bridge-ingest",
+      "destination": "/api/google-bridge-ingest.js"
     }
   ],
   "headers": [

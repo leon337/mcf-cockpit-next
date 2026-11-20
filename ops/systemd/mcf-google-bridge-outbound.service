@@ -1,0 +1,17 @@
+[Unit]
+Description=MCF Google Bridge outbound read-only snapshot publisher
+Documentation=https://github.com/leon337/mcf-cockpit-next
+After=network-online.target mcf-google-bridge.service
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+WorkingDirectory=%h/mcf-cockpit-next
+Environment=NODE_ENV=production
+EnvironmentFile=%h/.config/mcf-google-bridge/remote-publisher.env
+ExecStart=/home/leo/.nvm/versions/node/v24.18.0/bin/node %h/mcf-cockpit-next/tools/google-bridge-outbound-agent.mjs
+TimeoutStartSec=120
+NoNewPrivileges=true
+UMask=0077
+StandardOutput=journal
+StandardError=journal

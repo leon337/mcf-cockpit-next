@@ -235,6 +235,10 @@ function createHandler({ env = process.env, transport = fetch, getToken = readLo
     if (!["summary", "projects", "permissions", "tests", "audit"].includes(view)) {
       return json(res, 400, { ok: false, error: "INVALID_VIEW" });
     }
+    if (env.VERCEL && env.MCF_BRIDGE_REMOTE_ENABLED === "true") {
+      const remote = require("./google-bridge-remote.js").createHandler({env});
+      return remote(req, res, view, POLICY);
+    }
     if (view === "permissions") {
       return json(res, 200, { ok: true, policy: POLICY, localMode: allowLocalConnection(req, env) });
     }

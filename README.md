@@ -38,3 +38,17 @@ em vez de simular dados.
 Para operar no computador que já executa a Bridge, consulte
 [`docs/GOOGLE-BRIDGE-PANEL.md`](docs/GOOGLE-BRIDGE-PANEL.md). Não habilite a
 integração local na Render/Vercel nem exponha a porta via proxy público.
+
+## Google Bridge — relay remoto autenticado (desligado por padrão)
+
+A integração opcional de saída `mcf-gpu-x99 → HTTPS Vercel → Neon → Cockpit`
+possui allowlist somente leitura, snapshots assinados, anti-replay,
+pareamento privado com cookie HttpOnly e diagnóstico explícito de dados
+desatualizados. Não são encaminhados tokens OAuth, nem abertos endpoints
+do computador na internet. Consulte o runbook
+[`docs/GOOGLE-BRIDGE-OUTBOUND-RELAY.md`](docs/GOOGLE-BRIDGE-OUTBOUND-RELAY.md).
+
+**A integração não é ativada automaticamente pelo merge.** Para conectar
+dados reais na Vercel, são obrigatórios provisionamento privado de
+credenciais, teste E2E com Neon/HTTPS, revisão de segurança e gate de
+produção. A UI mantém estado seguro de indisponibilidade até a conclusão.
