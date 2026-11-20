@@ -4,11 +4,14 @@ on:
   push:
     branches:
       - feat/mcf-cockpit-google-bridge-20261120
+      - feat/mcf-google-bridge-outbound-relay-20261120
     paths:
       - "src/**"
-      - "api/google-bridge.js"
+      - "api/**"
+      - "ops/systemd/mcf-google-bridge-outbound.*"
+      - "tools/google-bridge-outbound-agent.mjs"
       - "server.js"
-      - "test/google-bridge.test.cjs"
+      - "test/**"
       - "package.json"
       - "package-lock.json"
       - ".github/workflows/google-bridge-panel-ci.yml"

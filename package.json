@@ -12,13 +12,15 @@
     "preview": "vite preview --host 0.0.0.0",
     "start": "node server.js",
     "typecheck": "tsc --noEmit",
-    "check": "npm run typecheck && node --check api/github.js && node --check api/ecosystem.js && node --check api/missions.js && node --check server.js && node --check api/google-bridge.js && npm run test:google-bridge",
+    "check": "npm run typecheck && node --check api/github.js && node --check api/ecosystem.js && node --check api/missions.js && node --check server.js && node --check api/google-bridge.js && npm run test:google-bridge && node --check api/google-bridge-remote.js && node --check api/google-bridge-login.js && node --check api/google-bridge-ingest.js && node --check api/lib/google-bridge-remote.js && npm run test:bridge-remote",
     "test:stage5": "node scripts/verify-stage5.mjs",
     "test:v3": "node scripts/verify-v3.mjs",
     "test:v3.1": "node scripts/verify-v3-1.mjs",
-    "test:google-bridge": "node --test test/google-bridge.test.cjs"
+    "test:google-bridge": "node --test test/google-bridge.test.cjs",
+    "test:bridge-remote": "node --test test/google-bridge-remote.test.cjs"
   },
   "dependencies": {
+    "@neondatabase/serverless": "^1.2.1",
     "@radix-ui/react-accordion": "^1.2.11",
     "@radix-ui/react-dialog": "^1.1.15",
     "@radix-ui/react-tabs": "^1.1.12",

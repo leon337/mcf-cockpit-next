@@ -1,0 +1,13 @@
+[Unit]
+Description=MCF Google Bridge outbound read-only snapshot every five minutes
+
+[Timer]
+OnBootSec=2min
+OnUnitInactiveSec=5min
+AccuracySec=20s
+RandomizedDelaySec=20s
+Persistent=true
+Unit=mcf-google-bridge-outbound.service
+
+[Install]
+WantedBy=timers.target

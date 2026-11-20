@@ -1,0 +1,62 @@
+{
+  "mission": "MCF-GOOGLE-BRIDGE-SECURE-REMOTE-20261120",
+  "owner": "LEANDRO",
+  "orchestrator": "MESTRE",
+  "repository": "leon337/mcf-cockpit-next",
+  "baseMainSha": "d647d28ffca61fbe314a8712cc128b669a81fdb8",
+  "host": "mcf-gpu-x99",
+  "architecture": {
+    "ingress": "Vercel -> Neon only after HMAC, explicit paired cookie and fail-closed",
+    "outbound": "local agent reads Bridge from 127.0.0.1:8755, publishes HTTPS",
+    "secrets": "never in Git/frontend/browser or public logs",
+    "readOnlyOperations": [
+      "google.status",
+      "google.cloud.projects"
+    ],
+    "bridgePublicPortOpened": false,
+    "agentTimerEnabled": false
+  },
+  "neon": {
+    "project": "mcf-central-operacoes",
+    "schema": "mcf_bridge",
+    "tables": [
+      "snapshots",
+      "ingest_receipts",
+      "auth_limits"
+    ],
+    "gatewayRole": "mcf_bridge_gateway",
+    "roleCanSelectPublicMcfRecords": false,
+    "snapshotRowsAtValidation": 0
+  },
+  "validated": {
+    "localBridgeStatus": true,
+    "localGoogleCloudProjects": 11,
+    "localGoogleChecksPass": 2,
+    "localBridgeAuditEntriesSanitized": 28,
+    "remoteUnitTestsPassed": 10,
+    "existingLocalTestsPassed": 12,
+    "TypeScript": "PASS",
+    "ViteBuild": "PASS",
+    "V3Regressions": "PASS",
+    "browserE2E": "SYNTHETIC_AUTHENTICATION_WORKFLOW_PASS",
+    "browserViewport": "390x844"
+  },
+  "browserScreenshot": {
+    "path": "remote-mobile-fixture.png",
+    "syntheticData": true,
+    "sha256": "234d2f2b6fc113141db771ea3ff7670726ad7736b2547a4a66d5e64d6f43c652"
+  },
+  "notYetValidated": [
+    "Vercel API configured with confidential environment keys",
+    "actual HTTPS HMAC -> Neon ingest",
+    "production paired-user session",
+    "remote live Cloud data in Vercel"
+  ],
+  "release": {
+    "branchIsolated": true,
+    "productionEnvironmentFlag": "false",
+    "productionDeployRequested": false,
+    "productionDeployed": false
+  },
+  "notes": "Synthetic Playwright responses test UI, not the real cloud data path. No secrets or personal Google data in screenshot."
+}

@@ -26,7 +26,9 @@ type Policy = {
 };
 type Summary = {
   ok: true;
-  mode: "connected" | "unavailable";
+  mode: "connected" | "unavailable" | "authentication_required" | "pending" | "remote";
+  publishedAt?: string;
+  stale?: boolean;
   reason?: string;
   checkedAt: string;
   policy: Policy;
@@ -44,17 +46,22 @@ type ProjectResponse = {
   checkedAt: string;
   traceId: string;
   projects: Array<{ projectId: string; displayName: string | null; state: string }>;
+  stale?: boolean;
+  source?: string;
 };
 type TestResponse = {
   ok: boolean;
   checkedAt: string;
-  tests: Array<{ operation: string; outcome: "PASS" | "FAIL"; traceId?: string; code?: string }>;
+  tests: Array<{ operation: string; outcome: "PASS" | "FAIL" | "STALE"; traceId?: string; code?: string }>;
+  source?: string;
+  stale?: boolean;
 };
 type AuditResponse = {
   ok: true;
   checkedAt: string;
   persistent: boolean;
-  scope: "LOCAL_PANEL_REQUESTS_ONLY" | "BRIDGE_LOCAL_AUDIT";
+  scope: "LOCAL_PANEL_REQUESTS_ONLY" | "BRIDGE_LOCAL_AUDIT" | "BRIDGE_LOCAL_AUDIT_SYNCED";
+  stale?: boolean;
   events: Array<{ at: string; operation: string; outcome: string; traceId: string | null }>;
 };
 
@@ -139,8 +146,13 @@ export function GoogleBridgeView() {
   const [audit, setAudit] = useState<AuditResponse | null>(null);
   const [busy, setBusy] = useState<string | null>("summary");
   const [error, setError] = useState<string | null>(null);
+  const [pairCode, setPairCode] = useState("");
+  const [pairBusy, setPairBusy] = useState(false);
+  const [pairError, setPairError] = useState<string | null>(null);
 
-  const connected = summary?.mode === "connected";
+  const remote = summary?.mode === "remote";
+  const connected = summary?.mode === "connected" || remote;
+  const isStale = Boolean(remote && summary?.stale);
 
   const refreshSummary = useCallback(async () => {
     setBusy("summary");
@@ -148,7 +160,7 @@ export function GoogleBridgeView() {
     try {
       const result = await getJson<Summary>("summary");
       setSummary(result);
-      if (result.mode !== "connected") {
+      if (result.mode !== "connected" && result.mode !== "remote") {
         setProjects(null);
         setTests(null);
         setAudit(null);
@@ -177,7 +189,8 @@ export function GoogleBridgeView() {
     try {
       const result = await getJson<TestResponse>("tests", { allowFailedTest: true });
       setTests(result);
-      if (!result.ok) setError("Um ou mais testes de leitura falharam. Consulte os detalhes abaixo.");
+      if (result.stale) setError("A última sincronização está desatualizada. Nenhum teste atual foi executado remotamente.");
+      else if (!result.ok) setError("Um ou mais testes de leitura falharam. Consulte os detalhes abaixo.");
     } catch {
       setTests(null);
       setError("Não foi possível executar os testes de leitura.");
@@ -199,6 +212,80 @@ export function GoogleBridgeView() {
     if (value === "audit") void loadAudit();
   }
 
+  async function pairDevice(event: React.FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    if (pairBusy || pairCode.length < 40) return;
+    setPairBusy(true);
+    setPairError(null);
+    try {
+      const response = await fetch("/api/google-bridge-login", {
+        method: "POST", credentials: "same-origin", cache: "no-store",
+        headers: {"content-type": "application/json"},
+        body: JSON.stringify({code: pairCode.trim()}),
+      });
+      if (!response.ok) {
+        setPairError(response.status === 429
+          ? "Muitas tentativas. Aguarde antes de tentar novamente."
+          : "Código incorreto ou indisponível. Verifique o código de pareamento local.");
+        return;
+      }
+      setPairCode("");
+      await refreshSummary();
+    } catch {
+      setPairError("Não foi possível autenticar a conexão segura.");
+    } finally {
+      setPairBusy(false);
+    }
+  }
+
+  async function disconnectRemote() {
+    try {
+      await fetch("/api/google-bridge-login?action=logout", {
+        method:"POST", credentials:"same-origin",
+      });
+    } finally {
+      setProjects(null);setTests(null);setAudit(null);
+      await refreshSummary();
+    }
+  }
+
+  if (summary?.mode === "authentication_required") {
+    return (
+      <div data-testid="google-bridge-panel" className="mx-auto max-w-2xl py-8 sm:py-14">
+        <section className="rounded-3xl border border-sky-400/20 bg-panel p-6 shadow-panel sm:p-10">
+          <div className="mb-5 grid size-14 place-items-center rounded-2xl bg-sky-400/10 text-sky-200">
+            <LockKeyhole className="size-7" aria-hidden="true" />
+          </div>
+          <span className="eyebrow">MCF · ACESSO PRIVADO</span>
+          <h1 className="mt-2 text-3xl font-bold text-white">Conectar Google Bridge</h1>
+          <p className="mt-3 text-sm leading-7 text-slate-400">
+            A Bridge está no computador autorizado. Para acessar os projetos Google Cloud neste
+            dispositivo, informe o código privado de pareamento. A credencial não fica salva
+            no navegador; a sessão usa cookie seguro HttpOnly com validade de 12 horas.
+          </p>
+          <form onSubmit={(event) => void pairDevice(event)} className="mt-7 space-y-4">
+            <label className="block text-sm font-semibold text-slate-200" htmlFor="mcf-pair-code">
+              Código de pareamento
+            </label>
+            <input id="mcf-pair-code" type="password" autoComplete="off"
+              value={pairCode} onChange={event=>setPairCode(event.target.value)}
+              placeholder="Cole o código gerado no computador MCF"
+              className="h-12 w-full rounded-xl border border-white/15 bg-black/20 px-4 font-mono text-sm text-white outline-none focus:border-sky-400/60" />
+            {pairError ? <p role="alert" className="text-sm text-rose-200">{pairError}</p> : null}
+            <button type="submit" disabled={pairBusy || pairCode.trim().length < 40}
+              className="min-h-12 w-full rounded-xl bg-sky-500 px-5 font-semibold text-white hover:bg-sky-400 disabled:opacity-40">
+              {pairBusy ? "Autenticando…" : "Conectar com segurança"}
+            </button>
+          </form>
+          <p className="mt-6 rounded-xl border border-white/10 p-4 text-xs leading-6 text-slate-500">
+            O código é emitido apenas no computador autorizado. Sem o pareamento,
+            nenhuma lista de projetos, auditoria ou operação Google é disponibilizada publicamente.
+          </p>
+        </section>
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-6" data-testid="google-bridge-panel">
       <section className="relative overflow-hidden rounded-3xl border border-sky-400/15 bg-gradient-to-br from-[#11263a] via-panel to-[#101629] p-6 sm:p-8">
@@ -215,15 +302,22 @@ export function GoogleBridgeView() {
               </h1>
             </div>
             <p className="mt-4 max-w-2xl text-sm leading-7 text-slate-300 sm:text-base">
-              Acompanhe a conexão local, consulte projetos autorizados e verifique os limites de
-              leitura da integração. O painel não publica credenciais nem habilita operações de escrita.
+              {remote
+                ? "Consulte snapshots autenticados enviados pelo agente local. Projetos, permissões, testes e auditoria permanecem restritos à sessão pareada."
+                : "Acompanhe a conexão local, consulte projetos autorizados e verifique os limites de leitura da integração. O painel não publica credenciais nem habilita operações de escrita."}
             </p>
           </div>
           <div className="flex flex-col items-start gap-3 lg:items-end">
             <StateTag
               connected={connected}
-              text={busy === "summary" ? "Verificando…" : connected ? "Bridge local conectada" : "Conexão não disponível"}
+              text={busy === "summary" ? "Verificando…" : isStale ? "Sincronização atrasada"
+                : remote ? "Bridge sincronizada" : connected ? "Bridge local conectada"
+                  : summary?.mode === "pending" ? "Aguardando agente local" : "Conexão não disponível"}
             />
+            {remote ? <button type="button" onClick={() => void disconnectRemote()}
+              className="inline-flex min-h-10 items-center gap-2 rounded-xl border border-white/10 px-3 text-xs text-slate-300 hover:bg-white/10">
+              Encerrar sessão
+            </button> : null}
             <button type="button" onClick={() => void refreshSummary()} disabled={busy !== null}
               className="inline-flex min-h-11 items-center gap-2 rounded-xl border border-sky-300/25 bg-sky-400/10 px-4 text-sm font-semibold text-sky-100 transition hover:bg-sky-400/20 disabled:cursor-wait disabled:opacity-40">
               <RefreshCw className={cn("size-4", busy === "summary" && "animate-spin")} aria-hidden="true" />
@@ -234,8 +328,9 @@ export function GoogleBridgeView() {
       </section>
 
       <section aria-label="Visão geral da integração" className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
-        <Stat label="Conexão" value={connected ? "Local ativa" : "Não disponível"}
-          description={connected ? "Consulta confirmada neste servidor." : "Sem acesso validado neste servidor."} />
+        <Stat label="Conexão" value={remote ? isStale ? "Desatualizada" : "Remota segura" : connected ? "Local ativa" : "Não disponível"}
+          description={remote ? `Última sincronização: ${timestamp(summary?.publishedAt)}`
+            : connected ? "Consulta confirmada neste servidor." : "Sem acesso validado neste servidor."} />
         <Stat label="OAuth Workspace"
           value={!connected ? "Não verificado" : summary?.status?.oauthConnected ? "Conectado" : "Pendente"}
           description="Estado informado pela Bridge local." />
@@ -271,7 +366,9 @@ export function GoogleBridgeView() {
       ) : null}
 
       {tab === "connection" ? (
-        <Panel title="Estado da conexão" subtitle="Consulta em tempo real, quando o Cockpit está no mesmo computador da Bridge.">
+        <Panel title="Estado da conexão" subtitle={remote
+          ? "Telemetria verificada do agente local por canal HTTPS autenticado, sem permitir acesso externo à porta 8755."
+          : "Consulta em tempo real, quando o Cockpit está no mesmo computador da Bridge."}>
           <div className="grid gap-5 lg:grid-cols-[1.2fr_1fr]">
             <div className="space-y-4 rounded-2xl border border-white/10 bg-black/10 p-5">
               <div className="flex items-start gap-3">
@@ -279,12 +376,18 @@ export function GoogleBridgeView() {
                   : <ShieldOff className="mt-0.5 size-5 text-amber-300" aria-hidden="true" />}
                 <div>
                   <h3 className="font-semibold text-white">
-                    {connected ? "Serviço local encontrado" : "Conexão local não confirmada"}
+                    {remote ? "Agente local autenticado" : connected ? "Serviço local encontrado" : "Conexão local não confirmada"}
                   </h3>
                   <p className="mt-2 text-sm leading-6 text-slate-400">
-                    {connected
-                      ? "A API do Cockpit acessou a Bridge em loopback. Nenhuma credencial foi enviada ao navegador."
-                      : "Este Cockpit não está autorizado a consultar a Bridge instalada em outro computador. A interface não usa dados fictícios para preencher esta visão."}
+                    {remote
+                      ? isStale
+                        ? "A última sincronização remota está atrasada. Os dados exibidos são históricos, não informação ao vivo."
+                        : "O agente local envia relatórios assinados para o backend remoto. Nenhum token Google ou acesso à porta local foi exposto."
+                      : connected
+                        ? "A API do Cockpit acessou a Bridge em loopback. Nenhuma credencial foi enviada ao navegador."
+                        : summary?.mode === "pending"
+                          ? "O pareamento está ativo. Aguardando o primeiro relatório assinado do agente local."
+                          : "Este Cockpit não está autorizado a consultar a Bridge instalada em outro computador. A interface não usa dados fictícios para preencher esta visão."}
                   </p>
                 </div>
               </div>
@@ -298,9 +401,9 @@ export function GoogleBridgeView() {
             <div className="space-y-4 rounded-2xl border border-white/10 bg-white/[0.025] p-5">
               <h3 className="font-semibold text-white">Proveniência e segurança</h3>
               <div className="space-y-3 text-sm text-slate-400">
-                <p><strong className="text-slate-200">Host:</strong> somente o computador que executa a Bridge.</p>
+                <p><strong className="text-slate-200">Host:</strong> {remote ? "mcf-gpu-x99 (agente de saída)" : "somente o computador que executa a Bridge"}.</p>
                 <p><strong className="text-slate-200">Operações:</strong> status e listagem de projetos.</p>
-                <p><strong className="text-slate-200">Última consulta:</strong> {timestamp(summary?.checkedAt)}</p>
+                <p><strong className="text-slate-200">{remote ? "Último envio:" : "Última consulta:"}</strong> {timestamp(remote ? summary?.publishedAt : summary?.checkedAt)}</p>
                 <p><strong className="text-slate-200">Trace:</strong> <Code>{summary?.status?.traceId || "Não disponível"}</Code></p>
               </div>
               <a href={summary?.policy.provenance || "https://github.com/leon337/multiagent-collaboration-framework"}
@@ -389,12 +492,13 @@ export function GoogleBridgeView() {
 
       {tab === "tests" ? (
         <Panel title="Testes de leitura"
-          subtitle="Diagnóstico real e não destrutivo; consulta somente o estado da Bridge e a listagem de projetos.">
+          subtitle={remote ? "Resultado do último teste executado pelo agente local. Não dispara comandos remotos nem testes ao vivo." :
+            "Diagnóstico real e não destrutivo; consulta somente o estado da Bridge e a listagem de projetos."}>
           <div className="flex flex-wrap items-center justify-between gap-4">
             <span className="text-sm text-slate-500">{tests ? `Executados em ${timestamp(tests.checkedAt)}` : "Nenhum teste nesta sessão"}</span>
             <button type="button" disabled={!connected || busy !== null} onClick={() => void runTests()}
               className="inline-flex min-h-11 items-center gap-2 rounded-xl bg-sky-500 px-5 text-sm font-semibold text-white transition hover:bg-sky-400 disabled:cursor-not-allowed disabled:opacity-40">
-              <FlaskConical className="size-4" aria-hidden="true" /> {busy === "tests" ? "Executando…" : "Executar teste"}
+              <FlaskConical className="size-4" aria-hidden="true" /> {busy === "tests" ? "Consultando…" : remote ? "Ver última verificação" : "Executar teste"}
             </button>
           </div>
           <div className="mt-5 space-y-3">
@@ -419,7 +523,10 @@ export function GoogleBridgeView() {
         <Panel title="Auditoria das consultas"
           subtitle="Histórico real do arquivo local da Bridge; se indisponível, últimas consultas deste painel durante o processo atual.">
           <div className="mb-4 flex items-center justify-between gap-3">
-            <span className="text-xs text-slate-500">{audit?.persistent ? "Fonte: arquivo de auditoria da Bridge (persistido)" : "Fonte: consultas deste painel (memória volátil)"}</span>
+            <span className="text-xs text-slate-500">{audit?.scope === "BRIDGE_LOCAL_AUDIT_SYNCED"
+              ? "Fonte: cópia autenticada de auditoria da Bridge (snapshot)"
+              : audit?.persistent ? "Fonte: arquivo de auditoria da Bridge (persistido)"
+                : "Fonte: consultas deste painel (memória volátil)"}</span>
             <button type="button" disabled={!connected || busy !== null} onClick={() => void loadAudit()}
               className="inline-flex min-h-10 items-center gap-2 rounded-xl border border-white/10 px-3 text-sm font-semibold text-white hover:bg-white/10 disabled:opacity-40">
               <RefreshCw className="size-4" /> Atualizar registros
@@ -450,7 +557,7 @@ export function GoogleBridgeView() {
 
       <footer className="flex flex-wrap items-center justify-between gap-2 rounded-xl border border-white/10 bg-black/10 px-4 py-3 text-xs text-slate-500">
         <span>MCF · Google Cloud · Escopo somente leitura · Credenciais nunca expostas ao navegador</span>
-        <span>Estado observado: {timestamp(summary?.checkedAt)}</span>
+        <span>{remote ? "Última sincronização" : "Estado observado"}: {timestamp(remote ? summary?.publishedAt : summary?.checkedAt)}</span>
       </footer>
     </div>
   );

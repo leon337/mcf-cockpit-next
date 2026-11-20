@@ -5,6 +5,8 @@ const githubHandler = require("./api/github.js");
 const ecosystemHandler = require("./api/ecosystem.js");
 const missionsHandler = require("./api/missions.js");
 const googleBridgeHandler = require("./api/google-bridge.js");
+const googleBridgeLoginHandler = require("./api/google-bridge-login.js");
+const googleBridgeIngestHandler = require("./api/google-bridge-ingest.js");
 
 const ROOT = __dirname;
 const DIST = path.join(ROOT, "dist");
@@ -61,6 +63,8 @@ http.createServer((req, res) => {
   if (url.pathname === "/api/ecosystem") return apiAdapter(ecosystemHandler, req, res);
   if (url.pathname === "/api/missions") return apiAdapter(missionsHandler, req, res);
   if (url.pathname === "/api/google-bridge") return apiAdapter(googleBridgeHandler, req, res);
+  if (url.pathname === "/api/google-bridge-login") return apiAdapter(googleBridgeLoginHandler, req, res);
+  if (url.pathname === "/api/google-bridge-ingest") return apiAdapter(googleBridgeIngestHandler, req, res);
 
   const relative = url.pathname === "/" ? "/index.html" : url.pathname;
   const candidate = path.resolve(STATIC_ROOT, "." + relative);
