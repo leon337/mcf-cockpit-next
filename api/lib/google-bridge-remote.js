@@ -117,18 +117,36 @@ function makeStore(env = process.env) {
       return rows[0] || null;
     },
     async save(snapshot, nonce, digest) {
-      const already = await sql`INSERT INTO mcf_bridge.ingest_receipts(nonce, source_id, published_at, project_count, content_hash)
-        VALUES(${nonce}::uuid, ${SOURCE_ID}, ${snapshot.publishedAt}::timestamptz, ${snapshot.projects.length}, ${digest})
-        ON CONFLICT (nonce) DO NOTHING RETURNING nonce`;
-      if (!already.length) return { accepted: false, updated: false };
-      const updated = await sql`INSERT INTO mcf_bridge.snapshots(source_id, snapshot, published_at, receipt_id)
-        VALUES(${SOURCE_ID}, ${JSON.stringify(snapshot)}::jsonb, ${snapshot.publishedAt}::timestamptz, ${nonce}::uuid)
-        ON CONFLICT (source_id) DO UPDATE
-          SET snapshot=EXCLUDED.snapshot, published_at=EXCLUDED.published_at,
-              receipt_id=EXCLUDED.receipt_id, received_at=now()
+      // One SQL statement makes replay registration and snapshot publication atomic.
+      // If publication fails, the nonce is not consumed without its snapshot.
+      const rows = await sql`
+        WITH accepted_receipt AS (
+          INSERT INTO mcf_bridge.ingest_receipts
+            (nonce, source_id, published_at, project_count, content_hash)
+          VALUES (
+            ${nonce}::uuid, ${SOURCE_ID}, ${snapshot.publishedAt}::timestamptz,
+            ${snapshot.projects.length}, ${digest}
+          )
+          ON CONFLICT (nonce) DO NOTHING RETURNING nonce
+        ), updated_snapshot AS (
+          INSERT INTO mcf_bridge.snapshots
+            (source_id, snapshot, published_at, receipt_id)
+          SELECT
+            ${SOURCE_ID}, ${JSON.stringify(snapshot)}::jsonb,
+            ${snapshot.publishedAt}::timestamptz, nonce
+          FROM accepted_receipt
+          ON CONFLICT (source_id) DO UPDATE
+            SET snapshot=EXCLUDED.snapshot,
+                published_at=EXCLUDED.published_at,
+                receipt_id=EXCLUDED.receipt_id, received_at=now()
           WHERE mcf_bridge.snapshots.published_at < EXCLUDED.published_at
-        RETURNING source_id`;
-      return { accepted: true, updated: updated.length === 1 };
+          RETURNING source_id
+        )
+        SELECT
+          EXISTS(SELECT 1 FROM accepted_receipt) AS accepted,
+          EXISTS(SELECT 1 FROM updated_snapshot) AS updated
+      `;
+      return { accepted: rows[0]?.accepted === true, updated: rows[0]?.updated === true };
     },
     async authAttempt(key) {
       const rows = await sql`INSERT INTO mcf_bridge.auth_limits(key_hash,attempts,expires_at)
