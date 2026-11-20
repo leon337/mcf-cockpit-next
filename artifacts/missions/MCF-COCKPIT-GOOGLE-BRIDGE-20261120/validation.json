@@ -1,0 +1,73 @@
+{
+  "mission_id": "MCF-COCKPIT-GOOGLE-BRIDGE-20261120",
+  "validation_at": "2026-11-20T14:06:25.567973+00:00",
+  "repo": "leon337/mcf-cockpit-next",
+  "base_commit": "d0d49e6a369ecd8f24e59694b1ac7ba651bd401c",
+  "human_authority": "LEANDRO",
+  "orchestrator": "MESTRE",
+  "env": "mcf-gpu-x99 local-only",
+  "security": "No Google credentials were printed, stored in repository, or exposed to client.",
+  "unit_tests": {
+    "result": "PASS",
+    "count": 12
+  },
+  "typescript": "PASS",
+  "build": "PASS",
+  "regressions": {
+    "stage5": "PASS",
+    "v3": "PASS",
+    "v3_1": "PASS"
+  },
+  "e2e_browser": {
+    "result": "PASS",
+    "type": "Chrome headless + Playwright",
+    "desktop_view": "PASS",
+    "projects_view": "PASS",
+    "unnamed_project_label": "PASS",
+    "tests_view": "PASS",
+    "audit_view": "PASS",
+    "mobile_policy_view": "PASS"
+  },
+  "e2e_live": {
+    "bridge_summary": "HTTP_200",
+    "oauth": true,
+    "adc": true,
+    "cloud_projects": "HTTP_200",
+    "cloud_project_count": 11,
+    "cloud_projects_missing_display_name": 1,
+    "cloud_test_operations": {
+      "google.status": "PASS",
+      "google.cloud.projects": "PASS"
+    },
+    "audit": "PERSISTED_LOG_READ_OK"
+  },
+  "screenshots": {
+    ".google-bridge-preview.png": {
+      "sha256": "f789852ee36b4623a3cb8ff323be5243ad92e198623b3f062bb1b0a75b1729d1",
+      "bytes": 263682,
+      "stored": "local-only, not committed"
+    },
+    ".google-bridge-projects.png": {
+      "sha256": "782869844383f7a6560bdab1ad6438993e5ffe0a65349c2d3702cc0d5c1378d2",
+      "bytes": 328665,
+      "stored": "local-only, not committed"
+    },
+    ".google-bridge-audit.png": {
+      "sha256": "14a4c0cc5ed0367b450b66e465bc67cc5c8d055f8001b95f769946c172e43d94",
+      "bytes": 586656,
+      "stored": "local-only, not committed"
+    },
+    ".google-bridge-mobile.png": {
+      "sha256": "32975266b3ea078b1cfba5f7795cc2ead85c33c103a5d11888dacc0d0c85c3b4",
+      "bytes": 214906,
+      "stored": "local-only, not committed"
+    }
+  },
+  "boundaries": {
+    "bind": "127.0.0.1:3190",
+    "public_host_disabled": true,
+    "prohibited_writes": true,
+    "production_deploy": "NOT_PERFORMED",
+    "central_mission_ledger": "NOT_VERIFIED"
+  }
+}

@@ -4,6 +4,7 @@ const path = require("path");
 const githubHandler = require("./api/github.js");
 const ecosystemHandler = require("./api/ecosystem.js");
 const missionsHandler = require("./api/missions.js");
+const googleBridgeHandler = require("./api/google-bridge.js");
 
 const ROOT = __dirname;
 const DIST = path.join(ROOT, "dist");
@@ -59,6 +60,7 @@ http.createServer((req, res) => {
   if (url.pathname === "/api/github") return apiAdapter(githubHandler, req, res);
   if (url.pathname === "/api/ecosystem") return apiAdapter(ecosystemHandler, req, res);
   if (url.pathname === "/api/missions") return apiAdapter(missionsHandler, req, res);
+  if (url.pathname === "/api/google-bridge") return apiAdapter(googleBridgeHandler, req, res);
 
   const relative = url.pathname === "/" ? "/index.html" : url.pathname;
   const candidate = path.resolve(STATIC_ROOT, "." + relative);
@@ -71,6 +73,6 @@ http.createServer((req, res) => {
   if (STATIC_ROOT === DIST) return send(path.join(DIST, "index.html"), res);
   res.statusCode = 404;
   res.end("Not found");
-}).listen(PORT, "0.0.0.0", () => {
+}).listen(PORT, (process.env.MCF_GOOGLE_BRIDGE_PANEL_ENABLED === "true" && !process.env.RENDER && !process.env.VERCEL) ? "127.0.0.1" : "0.0.0.0", () => {
   console.log("MCF Cockpit Next listening on port", PORT);
 });

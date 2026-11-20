@@ -9,6 +9,7 @@ import { EcosystemDashboard } from "@/components/v3/ecosystem-dashboard";
 import { RelationshipGraph } from "@/components/v3/relationship-graph";
 import { MissionsView } from "@/components/v3/missions-view";
 import { InsightsView } from "@/components/v3/insights-view";
+import { GoogleBridgeView } from "@/components/v3/google-bridge-view";
 import {
   normalizeCockpitLocation,
   readCockpitLocation,
@@ -55,6 +56,25 @@ export function App() {
 
   function changeProjectTab(tab: ProjectTab) {
     commitNavigation({ tab }, "replace");
+  }
+
+  if (nav.view === "google-bridge") {
+    const publicAccount = account.data?.account;
+    return (
+      <AppShell
+        activeView={nav.view}
+        onNavigate={navigate}
+        user={{
+          name: publicAccount?.name || publicAccount?.login || "Operação MCF",
+          login: publicAccount?.login || "leon337",
+          avatar: publicAccount?.avatar || "https://github.com/leon337.png",
+        }}
+        search={nav.q}
+        onSearchChange={(value) => commitNavigation({ q: value }, "replace")}
+      >
+        <GoogleBridgeView />
+      </AppShell>
+    );
   }
 
   if (account.isLoading || ecosystem.isLoading) {

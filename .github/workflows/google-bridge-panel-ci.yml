@@ -1,0 +1,39 @@
+name: MCF Google Bridge Panel CI
+
+on:
+  push:
+    branches:
+      - feat/mcf-cockpit-google-bridge-20261120
+    paths:
+      - "src/**"
+      - "api/google-bridge.js"
+      - "server.js"
+      - "test/google-bridge.test.cjs"
+      - "package.json"
+      - "package-lock.json"
+      - ".github/workflows/google-bridge-panel-ci.yml"
+  pull_request:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+jobs:
+  validation:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "24.18.0"
+          cache: npm
+      - name: Install locked dependencies
+        run: npm ci --no-audit --no-fund
+      - name: Typecheck, backend tests and syntax
+        run: npm run check
+      - name: Build production frontend
+        run: npm run build
+      - name: Regression checks V3.1
+        run: npm run test:stage5 && npm run test:v3 && npm run test:v3.1

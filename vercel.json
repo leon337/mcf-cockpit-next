@@ -12,6 +12,10 @@
     {
       "source": "/api/missions",
       "destination": "/api/missions.js"
+    },
+    {
+      "source": "/api/google-bridge",
+      "destination": "/api/google-bridge.js"
     }
   ],
   "headers": [
