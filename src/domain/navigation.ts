@@ -4,6 +4,7 @@ export const V3_VIEWS = [
   "projects",
   "missions",
   "insights",
+  "google-bridge",
 ] as const;
 
 export type V3View = (typeof V3_VIEWS)[number];

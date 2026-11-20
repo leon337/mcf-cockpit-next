@@ -2,6 +2,7 @@ import {
   Activity,
   Boxes,
   GitBranch,
+  Cloud,
   Lightbulb,
   Menu,
   Network,
@@ -22,6 +23,7 @@ const ITEMS: Array<{
   { id: "projects", label: "Projetos", icon: Boxes },
   { id: "missions", label: "Missões", icon: Activity },
   { id: "insights", label: "Insights", icon: Lightbulb },
+  { id: "google-bridge", label: "Google Bridge", icon: Cloud },
 ];
 
 export function AppShell({
@@ -151,7 +153,7 @@ export function AppShell({
         </div>
       ) : null}
 
-      <nav className="fixed inset-x-3 bottom-3 z-40 grid grid-cols-5 rounded-2xl border border-white/10 bg-[#08111c]/95 p-1.5 shadow-2xl backdrop-blur-xl lg:hidden">
+      <nav className="fixed inset-x-3 bottom-3 z-40 grid grid-cols-6 rounded-2xl border border-white/10 bg-[#08111c]/95 p-1.5 shadow-2xl backdrop-blur-xl lg:hidden">
         {ITEMS.map((item) => {
           const Icon = item.icon;
           const active = activeView === item.id;
@@ -166,7 +168,7 @@ export function AppShell({
               )}
             >
               <Icon className="size-4" aria-hidden="true" />
-              <span>{item.label}</span>
+              <span>{item.id === "google-bridge" ? "Google" : item.label}</span>
             </button>
           );
         })}

@@ -5,3 +5,10 @@ qa/
 *.log
 
 dist/
+
+# Local preview artifacts
+/.google-bridge-preview.pid
+/node_modules
+/.google-bridge-preview.png
+/.google-bridge-*.png
+/.google-bridge-e2e.cjs
